@@ -19,7 +19,6 @@ const props = withDefaults(defineProps<SidebarProps>(), {
   variant: 'floating',
 })
 
-// This is sample data.
 const data = {
   navMain: [
     {
@@ -58,7 +57,7 @@ const data = {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent class="h-full">
         <SidebarGroup>
           <SidebarMenu class="gap-2">
             <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
@@ -75,11 +74,14 @@ const data = {
                 </SidebarMenuSubItem>
               </SidebarMenuSub>
             </SidebarMenuItem>
+            <div class="ml-auto mt-auto">
+              <ThemeToggle />
+            </div>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-    <main>
+    <main class="ml-16 mt-16 flex h-full flex-col">
       <slot></slot>
     </main>
   </SidebarProvider>
