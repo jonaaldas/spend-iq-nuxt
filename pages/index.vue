@@ -1,5 +1,12 @@
 <template>
-  <div>Hello</div>
+  <div>
+    <SignedOut>
+      <SignInButton />
+    </SignedOut>
+    <SignedIn>
+      <UserButton />
+    </SignedIn>
+  </div>
 </template>
 
 <script setup lang="ts"></script>
