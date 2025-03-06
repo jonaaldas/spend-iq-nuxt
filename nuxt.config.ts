@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@clerk/nuxt',
     '@nuxtjs/color-mode',
     'nuxt-lucide-icons',
+    '@pinia/nuxt',
   ],
   shadcn: {
     prefix: '',
