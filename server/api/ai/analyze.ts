@@ -1,45 +1,56 @@
 import { fetchPlaidTransactions } from '~/server/components/transactions'
+import { streamText } from 'ai'
+import { createOpenAI } from '@ai-sdk/openai'
 
-export default defineEventHandler(async event => {
-  const { userId } = event.context.auth
+export default defineLazyEventHandler(async () => {
+  const apiKey = useRuntimeConfig().openaiApiKey
+  if (!apiKey) throw new Error('Missing OpenAI API key')
+  const openai = createOpenAI({ apiKey })
 
-  if (!userId) {
-    return createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-    })
-  }
-
-  try {
-    // Get the request body for any specific analysis parameters
-    const analysisParams = await readBody(event)
-
-    // Fetch transactions using our helper
-    const { transactions, accounts } = await fetchPlaidTransactions(userId)
-
-    // Here you would add your AI analysis logic
-    // For now, we'll just return the data
-    return {
-      success: true,
-      analysis: {
-        transactionCount: transactions.length,
-        accountCount: accounts.length,
-        // Add more analysis here
-      },
-      transactions,
-      accounts,
+  // Create a cached handler for fetching transactions
+  const getTransactions = cachedEventHandler(
+    async event => {
+      const { userId } = event.context.auth as { userId: string }
+      return await fetchPlaidTransactions(userId)
+    },
+    {
+      // Cache for 1 hour
+      maxAge: 60 * 60,
+      // Use userId as part of the cache key
+      getKey: event => `transactions:${event.context.auth.userId}`,
     }
-  } catch (error) {
-    if (error instanceof Error && error.message === 'No linked bank accounts found') {
-      return createError({
-        statusCode: 404,
-        statusMessage: error.message,
+  )
+
+  return defineEventHandler(async event => {
+    try {
+      const { messages } = await readBody(event)
+      const { userId } = event.context.auth
+
+      if (!userId) {
+        throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+      }
+
+      // Use the cached handler
+      const transactions = await getTransactions(event)
+      const transactionsString = JSON.stringify(transactions.transactions)
+
+      messages.push({
+        role: 'user',
+        content: `Here are the transactions: ${transactionsString}`,
+      })
+
+      const result = streamText({
+        model: openai('gpt-4o'),
+        messages,
+      })
+
+      return result.toDataStreamResponse()
+    } catch (error) {
+      console.error(error.message)
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'There was an error please try again later',
       })
     }
-
-    return createError({
-      statusCode: 500,
-      statusMessage: 'Failed to analyze transactions',
-    })
-  }
+  })
 })
