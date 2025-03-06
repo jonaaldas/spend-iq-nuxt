@@ -7,3 +7,5 @@
 - components/ChatBot.vue - Created new component for AI chat assistant
 - layouts/dashboard.vue - Integrated ChatBot into dashboard layout
 - components/ChatBot.vue - Improved chat layout with fixed textarea at bottom and proper message container
+- stores/financial-store.ts - Created Pinia store for managing financial data with TypeScript types
+- stores/financial-store.ts - Refactored store to use Composition API style with refs and computed properties
