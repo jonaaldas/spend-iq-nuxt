@@ -1,6 +1,7 @@
 import { CountryCode } from 'plaid'
 import { client } from '~/server/lib/plaid'
-import redis from '~/server/lib/redis'
+import { db } from '~/server/database/turso'
+import { plaidItems } from '~/server/database/schema'
 
 export default defineEventHandler(async event => {
   try {
@@ -34,23 +35,21 @@ export default defineEventHandler(async event => {
 
     const institutionName = institutionResponse.data.institution.name
 
-    // Get accounts for this item
     const accountsResponse = await client.accountsGet({
       access_token: ACCESS_TOKEN,
     })
 
-    // Store item information including the timestamp
     const timestamp = new Date().toISOString()
-    const itemData = {
-      item_id: ITEM_ID,
-      access_token: ACCESS_TOKEN,
-      institution_id: institutionId,
-      institution_name: institutionName,
-      date_connected: timestamp,
-      accounts: accountsResponse.data.accounts,
-    }
 
-    await redis.set(`plaid-nuxt:${userId}:item`, JSON.stringify(itemData))
+    await db.insert(plaidItems).values({
+      userId,
+      itemId: ITEM_ID,
+      accessToken: ACCESS_TOKEN,
+      institutionId,
+      institutionName,
+      dateConnected: timestamp,
+      accounts: JSON.stringify(accountsResponse.data.accounts),
+    })
 
     return {
       success: true,

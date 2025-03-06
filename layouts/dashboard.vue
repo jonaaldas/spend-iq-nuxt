@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/sidebar'
 
 import { GalleryVerticalEnd } from 'lucide-vue-next'
+import ChatBot from '@/components/ChatBot.vue'
 
 const props = withDefaults(defineProps<SidebarProps>(), {
   variant: 'floating',
@@ -81,8 +82,9 @@ const data = {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-    <main class="ml-16 mt-16 flex h-full flex-col">
+    <main class="mt-16 flex h-full flex-col w-full container mx-auto max-w-screen-lg">
       <slot></slot>
     </main>
+      <ChatBot />
   </SidebarProvider>
 </template>
