@@ -40,7 +40,7 @@
           {{ loadingPlaid ? 'Connecting...' : 'Connect Another Bank Account' }}
         </Button>
       </div>
-      <TransactionTable :transactions="transactions" />
+      <TransactionTable :transactions="financialData" />
     </div>
   </div>
 </template>
@@ -61,11 +61,10 @@ useHead({
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useFinancialStore } from '@/stores/financial-store'
 
-const loadingPlaid = ref(false)
-const isLoading = ref(true)
-const transactions = ref<any>({})
-const firstConnection = ref(true)
+const financialStore = useFinancialStore()
+const { financialData, isLoading, loadingPlaid, firstConnection } = storeToRefs(financialStore)
 
 const handleClick = async () => {
   loadingPlaid.value = true
@@ -93,19 +92,10 @@ const handleClick = async () => {
   loadingPlaid.value = false
 }
 
-const getTransactions = async () => {
-  const data = await $fetch<{ success: boolean; transactions: any[] }>('/api/plaid/transactions')
-  transactions.value.push(...data.transactions)
-}
-
 onMounted(async () => {
   isLoading.value = true
   try {
-    const res = await $fetch<{ success: boolean; transactions: any[] }>('/api/plaid/transactions')
-    if (res.success) {
-      transactions.value = res
-      firstConnection.value = false
-    }
+    await financialStore.fetchTransactions()
   } catch (error) {
     console.error('Error fetching transactions:', error)
   } finally {
