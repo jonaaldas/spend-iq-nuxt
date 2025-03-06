@@ -20,4 +20,10 @@ export default defineNuxtConfig({
   clerk: {
     skipServerMiddleware: true,
   },
+  colorMode: {
+    classSuffix: '',
+  },
+  runtimeConfig: {
+    openaiApiKey: process.env.NUXT_OPENAI_API_KEY,
+  },
 })

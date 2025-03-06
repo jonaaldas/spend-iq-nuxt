@@ -14,11 +14,22 @@
           </SheetHeader>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-6 py-4"></div>
+        <div class="flex-1 overflow-y-auto px-6 py-4">
+          <div v-for="m in messages" :key="m.id" class="whitespace-pre-wrap">
+            {{ m.role === 'user' ? 'User: ' : 'AI: ' }}
+            {{ m.content }}
+          </div>
+        </div>
 
         <div class="border-t bg-background p-6">
+          <span v-if="apiError" class="text-red-500 mb-4">{{ apiError }}</span>
           <div class="flex gap-2">
-            <Textarea rows="1" placeholder="Type your message..." class="flex-1 resize-none" />
+            <Textarea
+              v-model="input"
+              rows="1"
+              placeholder="Type your message..."
+              class="flex-1 resize-none"
+            />
             <Button size="icon" @click="handleSubmit">
               <MessageCircle class="h-4 w-4" />
             </Button>
@@ -41,21 +52,20 @@ import {
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { MessageCircle } from 'lucide-vue-next'
-import { useFinancialStore } from '@/stores/financial-store'
+import { useChat } from '@ai-sdk/vue'
 
-const financialStore = useFinancialStore()
-const { financialData } = storeToRefs(financialStore)
+const apiError = ref<string | undefined>(undefined)
+const { messages, input, handleSubmit, error } = useChat({
+  api: '/api/ai/analyze',
+  onError: error => {
+    try {
+      apiError.value = JSON.parse(error.message).message
+      apiError.value = apiError.value
+    } catch (e) {
+      apiError.value = 'There was an error please try again later'
+    }
+  },
+})
 
 const isOpen = ref(false)
-
-const handleSubmit = async (e: Event) => {
-  e.preventDefault()
-  const res = await $fetch('/api/ai/analyze', {
-    method: 'POST',
-    body: {
-      financialData: financialData.value,
-    },
-  })
-  console.log(res)
-}
 </script>
