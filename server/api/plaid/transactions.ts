@@ -1,5 +1,5 @@
-import { fetchPlaidTransactions } from '~/server/components/transactions'
-
+import { cachedFetchPlaidTransactions } from '~/server/components/transactions'
+import { clearNuxtData } from 'nuxt/app'
 export default defineEventHandler(async event => {
   const { userId } = event.context.auth
 
@@ -11,7 +11,7 @@ export default defineEventHandler(async event => {
   }
 
   try {
-    const response = await fetchPlaidTransactions(userId)
+    const response = await cachedFetchPlaidTransactions(userId)
     return response
   } catch (error) {
     if (error instanceof Error && error.message === 'No linked bank accounts found') {
