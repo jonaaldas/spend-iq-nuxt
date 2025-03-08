@@ -42,7 +42,11 @@
             </div>
           </div>
 
-          <Waitlist afterJoinWaitlistUrl="/thank-you" :appearance="{ baseTheme: theme }" />
+          <Waitlist
+            :key="renderKey"
+            afterJoinWaitlistUrl="/thank-you"
+            :appearance="{ baseTheme: theme }"
+          />
         </div>
       </main>
 
@@ -79,11 +83,10 @@ import {
   Code,
   Server,
 } from 'lucide-vue-next'
-import ThemeToggle from '@/components/ThemeToggle.vue'
-import { dark, BaseTheme } from '@clerk/themes'
+import { dark } from '@clerk/themes'
 
-const theme = ref<typeof BaseTheme | undefined>(undefined)
-
+const theme = ref<typeof dark | undefined>(undefined)
+const renderKey = ref(0)
 const features = [
   { icon: Wallet, text: 'Connect all your bank accounts' },
   { icon: Bot, text: 'Have AI categorize your transactions' },
@@ -95,14 +98,14 @@ const features = [
   { icon: Server, text: 'Self-host for free or use our hosted service for a monthly fee' },
 ]
 
-const changeTheme = (theme: string) => {
-  theme.value = theme === 'dark' ? dark : undefined
-  console.log('🚀 ~ changeTheme ~ theme.value:', theme.value)
+const changeTheme = (themeString: string) => {
+  theme.value = themeString == 'dark' ? dark : undefined
+  renderKey.value++
   return theme.value
 }
 
 onMounted(() => {
-  theme.value = localStorage.getItem('theme') || dark
+  theme.value = localStorage.getItem('theme') || 'dark'
 })
 </script>
 
