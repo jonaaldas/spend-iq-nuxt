@@ -51,6 +51,9 @@ export default defineEventHandler(async event => {
       accounts: JSON.stringify(accountsResponse.data.accounts),
     })
 
+    const storage = useStorage('cache')
+    await storage.removeItem(`transactions:${userId}`)
+
     return {
       success: true,
       institution_name: institutionName,

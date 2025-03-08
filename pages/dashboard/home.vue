@@ -35,7 +35,7 @@
     </div>
 
     <div v-else class="flex flex-col gap-4 w-full">
-      <div class="flex justify-end">
+      <div class="flex justify-end gap-6">
         <Button @click="handleClick" size="sm">
           {{ loadingPlaid ? 'Connecting...' : 'Connect Another Bank Account' }}
         </Button>
@@ -87,6 +87,7 @@ const handleClick = async () => {
       }
     },
   }
+
   const handler = window.Plaid.create(config)
   handler.open()
   loadingPlaid.value = false
