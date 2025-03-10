@@ -155,32 +155,12 @@ import { Button } from '@/components/ui/button'
 import { Send, Bot, MessageSquare } from 'lucide-vue-next'
 import { useChat } from '@ai-sdk/vue'
 import { Textarea } from '@/components/ui/textarea'
+import { micromark } from 'micromark'
 const apiError = ref<string | undefined>(undefined)
 const isLoading = ref(false)
 
 const formatMessage = (content: string) => {
-  // Basic markdown-like formatting
-  return (
-    content
-      // Code blocks
-      .replace(
-        /```([^`]+)```/g,
-        '<pre class="bg-muted/50 p-3 rounded-lg my-2 overflow-x-auto">$1</pre>'
-      )
-      // Bold text
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      // Lists
-      .replace(/^\d+\.\s+(.+)$/gm, '<li class="list-decimal ml-4">$1</li>')
-      // Math expressions
-      .replace(/\\\[(.*?)\\\]/g, '<div class="text-center my-2">$1</div>')
-      // Tables (if needed)
-      .replace(
-        /\|(.+)\|/g,
-        '<div class="overflow-x-auto"><table class="min-w-full"><tr><td>$1</td></tr></table></div>'
-      )
-      // Line breaks
-      .replace(/\n\n/g, '<br><br>')
-  )
+  return micromark(content)
 }
 
 const {

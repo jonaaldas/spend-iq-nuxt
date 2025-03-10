@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-
 interface Transaction {
   transaction_id: string
   date: string
@@ -69,14 +68,22 @@ export const useFinancialStore = defineStore('financial', () => {
         accounts: Account[]
       }>('/api/plaid/transactions')
 
-      if (res.success) {
+      if (res.success && res.accounts.length > 0) {
         financialData.value = res
+        firstConnection.value = false
+        return
+      } else {
+        firstConnection.value = true
+        return {
+          success: false,
+          transactions: [],
+          accounts: [],
+        }
       }
-      loadingPlaid.value = false
-      firstConnection.value = false
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch transactions'
       console.error('Error fetching transactions:', err)
+      firstConnection.value = true
     } finally {
       isLoading.value = false
       loadingPlaid.value = false

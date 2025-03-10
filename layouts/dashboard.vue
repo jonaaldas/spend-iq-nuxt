@@ -27,11 +27,6 @@ const data = {
       url: '/dashboard/home',
       items: [],
     },
-    {
-      title: 'Expenses',
-      url: '/dashboard/expenses',
-      items: [],
-    },
   ],
 }
 </script>
@@ -85,6 +80,6 @@ const data = {
     <main class="mt-16 flex h-full flex-col w-full container mx-auto max-w-screen-lg">
       <slot></slot>
     </main>
-      <ChatBot />
+    <ChatBot />
   </SidebarProvider>
 </template>

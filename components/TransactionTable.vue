@@ -2,33 +2,43 @@
   <div class="container mx-auto py-8">
     <h1 class="text-3xl font-bold mb-8">Financial Overview</h1>
 
-    <!-- Accounts Table -->
     <div class="mb-12">
       <h2 class="text-2xl font-semibold mb-4">Accounts</h2>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Subtype</TableHead>
-            <TableHead class="text-right">Available</TableHead>
-            <TableHead class="text-right">Current Balance</TableHead>
-            <TableHead>Currency</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow v-for="account in transactions.accounts" :key="account.account_id">
-            <TableCell>{{ account.name }}</TableCell>
-            <TableCell class="capitalize">{{ account.type }}</TableCell>
-            <TableCell class="capitalize">{{ account.subtype }}</TableCell>
-            <TableCell class="text-right">{{
-              formatCurrency(account.balances.available)
-            }}</TableCell>
-            <TableCell class="text-right">{{ formatCurrency(account.balances.current) }}</TableCell>
-            <TableCell>{{ account.balances.iso_currency_code }}</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <Tabs :default-value="accountTypes[0]" class="w-full">
+        <TabsList class="">
+          <TabsTrigger v-for="type in accountTypes" :key="type" :value="type" class="capitalize">
+            {{ type }}
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent v-for="type in accountTypes" :key="type" :value="type">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Subtype</TableHead>
+                <TableHead class="text-right">Available</TableHead>
+                <TableHead class="text-right">Current Balance</TableHead>
+                <TableHead>Currency</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="account in filteredAccounts(type)" :key="account.account_id">
+                <TableCell>{{ account.name }}</TableCell>
+                <TableCell class="capitalize">{{ account.type }}</TableCell>
+                <TableCell class="capitalize">{{ account.subtype }}</TableCell>
+                <TableCell class="text-right">{{
+                  formatCurrency(account.balances.available)
+                }}</TableCell>
+                <TableCell class="text-right">{{
+                  formatCurrency(account.balances.current)
+                }}</TableCell>
+                <TableCell>{{ account.balances.iso_currency_code }}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TabsContent>
+      </Tabs>
     </div>
 
     <!-- Transactions Table -->
@@ -46,7 +56,10 @@
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow v-for="transaction in transactions.transactions" :key="transaction.transaction_id">
+          <TableRow
+            v-for="transaction in transactions.transactions"
+            :key="transaction.transaction_id"
+          >
             <TableCell>{{ formatDate(transaction.date) }}</TableCell>
             <TableCell>
               <div class="flex items-center gap-2">
@@ -91,7 +104,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Root2, Account, Added } from '@/types/plaid'
 import { Badge } from '@/components/ui/badge'
 import {
   Table,
@@ -102,13 +114,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import type { Root } from './types.ts'
 const props = defineProps<{
-  transactions: any[]
+  transactions: Root
 }>()
-
-const plaidData = ref<Root2[]>([])
-const accounts = computed(() => plaidData.value[0]?.accounts || [])
-const transactions = computed(() => props.transactions)
 
 // Helper function to format currency
 const formatCurrency = (amount: number | undefined) => {
@@ -126,5 +136,15 @@ const formatDate = (dateStr: string) => {
     month: 'short',
     day: 'numeric',
   })
+}
+
+const accountTypes = computed(() => {
+  console.log(props.transactions)
+  const types = new Set(props.transactions.accounts.map(account => account.type))
+  return Array.from(types)
+})
+
+const filteredAccounts = (type: string) => {
+  return props.transactions.accounts.filter(account => account.type === type)
 }
 </script>

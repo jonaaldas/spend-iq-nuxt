@@ -22,7 +22,7 @@
     </div>
 
     <div
-      v-else-if="firstConnection"
+      v-else-if="firstConnection == true"
       class="flex flex-col gap-4 items-center justify-center min-h-[50vh]"
     >
       <div class="text-center mb-8">
@@ -40,7 +40,7 @@
           {{ loadingPlaid ? 'Connecting...' : 'Connect Another Bank Account' }}
         </Button>
       </div>
-      <TransactionTable :transactions="financialData" />
+      Hello
     </div>
   </div>
 </template>
@@ -62,7 +62,6 @@ useHead({
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFinancialStore } from '@/stores/financial-store'
-
 const financialStore = useFinancialStore()
 const { financialData, isLoading, loadingPlaid, firstConnection } = storeToRefs(financialStore)
 
@@ -81,7 +80,7 @@ const handleClick = async () => {
       })
       if (res.success) {
         console.log('Successfully set access token')
-        await getTransactions()
+        await financialStore.fetchTransactions()
       } else {
         console.error('Failed to set access token')
       }
