@@ -33,3 +33,11 @@
 - components/ThemeToggle.vue - Added theme toggle component with animations
 - Updated landing page to use shadcn-vue color tokens for proper dark mode support
 - Added CSS variables for shadcn-vue theming 
+
+## 2024-03-14
+- Implemented Budget Backend
+- types/budget.types.ts - Created budget type definitions
+- server/api/budget/create.post.ts - Implemented budget creation endpoint
+- server/api/budget/index.get.ts - Implemented get budgets endpoint
+- server/api/budget/update.put.ts - Implemented update budget endpoint
+- server/api/budget/delete.delete.ts - Implemented delete budget endpoint with soft delete
