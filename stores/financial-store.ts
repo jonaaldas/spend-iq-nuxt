@@ -39,7 +39,7 @@ export const useFinancialStore = defineStore('financial', () => {
     transactions: [],
     accounts: [],
   })
-  const isLoading = ref(false)
+  const isLoading = ref(true)
   const loadingPlaid = ref(false)
   const firstConnection = ref(true)
   const error = ref<string | null>(null)
@@ -57,7 +57,6 @@ export const useFinancialStore = defineStore('financial', () => {
 
   // Actions
   async function fetchTransactions() {
-    isLoading.value = true
     error.value = null
     loadingPlaid.value = true
 

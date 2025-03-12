@@ -41,3 +41,26 @@
 - server/api/budget/index.get.ts - Implemented get budgets endpoint
 - server/api/budget/update.put.ts - Implemented update budget endpoint
 - server/api/budget/delete.delete.ts - Implemented delete budget endpoint with soft delete
+
+## 2024-03-26
+- pages/dashboard/home.vue - Updated financial overview with balance visualization
+- Added total balance calculation across all accounts
+- Implemented pending transactions tracking
+- Added total spent calculation for cleared transactions
+- Enhanced UI with detailed account summary and balance breakdown
+
+## 2024-03-11
+- components/DataTable.vue - Implemented dynamic data table component with TanStack Table
+- types/data-table.types.ts - Created type definitions for data table component
+- Added support for sorting, filtering, pagination, and column visibility
+- Implemented row expansion and global filtering capabilities
+- Created a reusable component that follows shadcn-vue design patterns
+
+## 2024-04-17
+- components/ui/sidebar/SidebarProvider.vue - Fixed gap property by adding flex-col class to make vertical gaps work
+- layouts/dashboard.vue - Added proper NavItem interface to fix type errors with menu items
+- layouts/dashboard.vue - Updated SidebarProvider to use gap-6 for proper spacing between elements
+- pages/dashboard/home.vue - Updated the Donut chart to display spending by transaction categories
+- Enhanced visualization to show top 5 categories with amounts
+- Fixed type errors related to personal_finance_category property
+- Improved UI with proper categorization of expenses and data formatting
