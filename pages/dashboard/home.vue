@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoading" class="flex flex-col gap-8">
+  <!-- <div v-if="isLoading" class="flex flex-col gap-8">
     <div class="flex flex-col gap-4">
       <Skeleton class="h-8 w-48" />
       <div class="flex flex-col gap-2">
@@ -89,7 +89,9 @@
       </CardContent>
     </Card>
     <DataTable :columns="columnsTable" :data="financialData.transactions" />
-  </div>
+  </div> -->
+
+  <div>Home</div>
 </template>
 
 <script setup lang="ts">
