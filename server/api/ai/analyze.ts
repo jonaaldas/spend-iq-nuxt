@@ -41,11 +41,12 @@ export default defineLazyEventHandler(async () => {
       return result.toDataStreamResponse({
         getErrorMessage: errorHandler,
       })
-    } catch (error: unknown) {
-      console.error(error instanceof Error ? error.message : 'Unknown error occurred')
+    } catch (error) {
+      console.error('Error in AI analysis:', error)
       throw createError({
         statusCode: 500,
-        statusMessage: 'There was an error please try again later',
+        statusMessage: 'Internal Server Error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       })
     }
   })

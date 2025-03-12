@@ -64,3 +64,10 @@
 - Enhanced visualization to show top 5 categories with amounts
 - Fixed type errors related to personal_finance_category property
 - Improved UI with proper categorization of expenses and data formatting
+
+## 2024-11-01
+- server/components/transactions.ts - Replaced Nuxt caching with Redis-based caching for transactions
+- server/api/plaid/set-access-token.ts - Updated cache busting to use Redis
+- server/api/plaid/transactions.ts - Simplified transactions endpoint to use new Redis cache
+- Added environment-aware cache keys (TRANSACTIONS_DEV_[USER_ID] for dev and TRANSACTIONS_PROD_[USER_ID] for prod)
+- Improved caching mechanism with 1-hour expiration time

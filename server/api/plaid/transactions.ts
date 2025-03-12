@@ -1,5 +1,5 @@
 import { cachedFetchPlaidTransactions } from '~/server/components/transactions'
-import { clearNuxtData } from 'nuxt/app'
+
 export default defineEventHandler(async event => {
   const { userId } = event.context.auth
 

@@ -2,6 +2,7 @@ import { CountryCode } from 'plaid'
 import { client } from '~/server/lib/plaid'
 import { db } from '~/server/database/turso'
 import { plaidItems } from '~/server/database/schema'
+import { clearTransactionsCache } from '~/server/components/transactions'
 
 export default defineEventHandler(async event => {
   try {
@@ -51,8 +52,8 @@ export default defineEventHandler(async event => {
       accounts: JSON.stringify(accountsResponse.data.accounts),
     })
 
-    const storage = useStorage('cache')
-    await storage.removeItem(`transactions:${userId}`)
+    // Clear the Redis cache for this user's transactions
+    await clearTransactionsCache(userId)
 
     return {
       success: true,
