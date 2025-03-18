@@ -19,6 +19,11 @@ export default defineNuxtConfig({
   },
   clerk: {
     skipServerMiddleware: false,
+    signInUrl: process.env.NUXT_CLERK_SIGN_IN_URL,
+    signUpUrl: process.env.NUXT_CLERK_SIGN_UP_URL,
+    signInForceRedirectUrl: process.env.NUXT_CLERK_SIGN_IN_FORCE_REDIRECT_URL,
+    signUpForceRedirectUrl: process.env.NUXT_CLERK_SIGN_UP_FORCE_REDIRECT_URL,
+    afterSignOutUrl: '/sign-in',
   },
   runtimeConfig: {
     openaiApiKey: process.env.NUXT_OPENAI_API_KEY,
