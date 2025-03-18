@@ -1,13 +1,10 @@
 <template>
   <div class="min-h-screen bg-background text-foreground relative overflow-hidden">
-    <div class="absolute top-4 right-4">
-      <DarkModeToggle @toggle-theme="changeTheme" />
-    </div>
     <div class="container relative z-10 mx-auto px-4 py-8 flex flex-col min-h-screen">
       <main class="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full py-12">
         <div class="text-center mb-8">
           <h1 class="text-4xl md:text-5xl font-bold mb-3">
-            Know where your money goes with
+            Use AI to ask questions about your spending
             <span
               class="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-600 bg-clip-text text-transparent"
             >
@@ -89,7 +86,6 @@ const theme = ref<typeof dark | undefined>(undefined)
 const renderKey = ref(0)
 const features = [
   { icon: Wallet, text: 'Connect all your bank accounts' },
-  { icon: Bot, text: 'Have AI categorize your transactions' },
   { icon: MessageSquare, text: 'Get insights into your spending via Telegram' },
   { icon: Zap, text: 'Use AI to ask questions about your spending' },
   { icon: BanknoteIcon, text: 'Set budgets and goals' },

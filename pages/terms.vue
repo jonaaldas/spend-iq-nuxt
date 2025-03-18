@@ -1,5 +1,5 @@
 <template>
-  <div class="dark min-h-screen bg-black relative overflow-hidden">
+  <div class="min-h-screen bg-black relative overflow-hidden">
     <div class="container relative z-10 mx-auto px-4 py-8 flex flex-col min-h-screen">
       <header class="py-6">
         <div class="flex justify-between items-center">

@@ -13,7 +13,4 @@ export default defineNuxtConfig({
   clerk: {
     skipServerMiddleware: true,
   },
-  colorMode: {
-    classSuffix: '',
-  },
 })
