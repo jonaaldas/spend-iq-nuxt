@@ -1,10 +1,7 @@
 <template>
   <div class="min-h-screen bg-background text-foreground relative overflow-hidden">
-    <!-- <div class="absolute top-4 right-4">
-      <DarkModeToggle @toggle-theme="changeTheme" />
-    </div> -->
     <div class="container relative z-10 mx-auto px-4 py-8 flex flex-col h-svh">
-      <main class="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full py-12">
+      <main class="flex-1 flex flex-col items-center justify-center max-w-4xl mx-auto w-full py-12">
         <div class="text-center mb-8">
           <h1 class="text-4xl md:text-5xl font-bold mb-3">
             Use AI to ask questions about your spending
