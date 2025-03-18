@@ -6,6 +6,6 @@ export default clerkMiddleware(async event => {
   const isPublic = publicRoutes.some(route => event.path.startsWith(route))
 
   if (!userId && !isPublic) {
-    // return await sendRedirect(event, '/')
+    return await sendRedirect(event, '/')
   }
 })

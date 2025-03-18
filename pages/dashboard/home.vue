@@ -44,10 +44,10 @@
           <CardContent>
             <div class="flex flex-row w-full">
               <div class="w-2/5 flex items-center justify-center h-[300px]">
-                <Donut
-                  :data="categoryData"
-                  category="value"
+                <DonutChart
                   index="name"
+                  :category="'total'"
+                  :data="categoryData"
                   :value-formatter="formatCurrency"
                 />
               </div>
@@ -64,9 +64,11 @@
                       class="flex items-center justify-between"
                     >
                       <div class="space-y-1">
-                        <p class="text-sm font-medium leading-none">{{ category.name }}</p>
+                        <p class="text-sm font-medium leading-none">
+                          {{ category.name }}
+                        </p>
                       </div>
-                      <div class="font-medium">{{ formatCurrency(category.value) }}</div>
+                      <div class="font-medium">{{ formatCurrency(category.total) }}</div>
                     </div>
                   </div>
                   <div class="pt-4 mt-4 border-t">
@@ -141,8 +143,8 @@ const categoryData = computed(() => {
   const categoryMap = new Map<string, number>()
 
   financialData.value.transactions.forEach(transaction => {
-    if (transaction.personal_finance_category?.detailed) {
-      const category = transaction.personal_finance_category.detailed
+    if (transaction.personal_finance_category?.primary) {
+      const category = transaction.personal_finance_category.primary
       const amount = Math.abs(transaction.amount)
 
       if (categoryMap.has(category)) {
@@ -152,20 +154,23 @@ const categoryData = computed(() => {
       }
     }
   })
+  console.log(categoryMap)
 
   // Convert map to array and sort by value (descending)
   const result = Array.from(categoryMap.entries())
-    .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value)
+    .map(([name, value]) => ({ name, total: Number(value) }))
+    .sort((a, b) => b.total - a.total)
 
   // Take top 8 categories and group the rest as "Other"
   if (result.length > 8) {
     const topCategories = result.slice(0, 7)
     const otherCategories = result.slice(7)
-    const otherSum = otherCategories.reduce((sum, cat) => sum + cat.value, 0)
+    const otherSum = otherCategories.reduce((sum, cat) => sum + cat.total, 0)
 
-    return [...topCategories, { name: 'Other', value: otherSum }]
+    return [...topCategories, { name: 'Other', total: otherSum }]
   }
+
+  console.log(result)
 
   return result
 })
@@ -175,31 +180,6 @@ const formatCurrency = (amount: number) => {
     style: 'currency',
     currency: 'USD',
   }).format(amount)
-}
-
-const handleClick = async () => {
-  const data = await $fetch('/api/plaid/create-link-token', {
-    method: 'POST',
-  })
-
-  const config = {
-    token: data.link_token,
-    onSuccess: async (public_token: string, metadata: any) => {
-      const res = await $fetch<{ success: boolean }>('/api/plaid/set-access-token', {
-        method: 'POST',
-        body: { public_token },
-      })
-      if (res.success) {
-        console.log('Successfully set access token')
-        await financialStore.fetchTransactions()
-      } else {
-        console.error('Failed to set access token')
-      }
-    },
-  }
-
-  const handler = window.Plaid.create(config)
-  handler.open()
 }
 
 const generateColumns = () => {
@@ -219,7 +199,6 @@ const generateColumns = () => {
     'iso_currency_code',
     'location',
     'transaction_type',
-    'location',
     'merchant_name',
     'payment_channel',
     'pending',

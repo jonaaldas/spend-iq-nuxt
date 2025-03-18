@@ -18,7 +18,7 @@ export default defineNuxtConfig({
     cssPath: './assets/css/global.css',
   },
   clerk: {
-    skipServerMiddleware: true,
+    skipServerMiddleware: false,
   },
   runtimeConfig: {
     openaiApiKey: process.env.NUXT_OPENAI_API_KEY,

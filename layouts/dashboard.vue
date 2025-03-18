@@ -111,7 +111,7 @@ onMounted(async () => {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <main class="mt-16 flex h-full w-full max-w-screen-lg mx-auto px-4">
+      <main class="mt-16 flex h-full w-full max-w-screen-2xl mx-auto px-4">
         <slot></slot>
       </main>
       <ChatBot />
