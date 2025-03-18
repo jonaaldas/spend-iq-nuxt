@@ -2,27 +2,31 @@
   <div>
     <!-- Dialog -->
     <Dialog v-model:open="isOpen" class="z-50">
-      <DialogContent class="max-w-[750px] gap-0 p-0 outline-none">
-        <div class="flex h-[85vh] w-full flex-col overflow-hidden">
-          <div class="flex-1 overflow-y-auto px-4 py-6">
+      <DialogContent
+        class="sm:max-w-[750px] max-w-[95%] h-[90vh] sm:h-[85vh] gap-0 p-0 outline-none"
+      >
+        <div class="flex h-full w-full flex-col overflow-hidden">
+          <div class="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6">
             <div
               v-if="messages.length === 0"
-              class="flex flex-col items-center justify-center py-8"
+              class="flex flex-col items-center justify-center py-6 sm:py-8"
             >
-              <Bot class="h-12 w-12 text-muted-foreground mb-6 animate-pulse" />
+              <Bot
+                class="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mb-4 sm:mb-6 animate-pulse"
+              />
               <div class="text-center space-y-2">
-                <h3 class="text-lg font-semibold">Financial Assistant</h3>
-                <p class="text-sm text-muted-foreground max-w-sm">
+                <h3 class="text-base sm:text-lg font-semibold">Financial Assistant</h3>
+                <p class="text-xs sm:text-sm text-muted-foreground max-w-sm">
                   Ask me anything about your finances. I can help you analyze spending patterns,
                   track expenses, and provide insights.
                 </p>
-                <div class="pt-4">
+                <div class="pt-3 sm:pt-4">
                   <p class="text-xs text-muted-foreground">Try asking:</p>
                   <div class="mt-2 flex flex-col gap-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      class="w-full hover:bg-muted/50"
+                      class="w-full text-xs sm:text-sm hover:bg-muted/50"
                       @click="setExample('What were my biggest expenses last month?')"
                     >
                       What were my biggest expenses last month?
@@ -30,7 +34,7 @@
                     <Button
                       variant="outline"
                       size="sm"
-                      class="w-full hover:bg-muted/50"
+                      class="w-full text-xs sm:text-sm hover:bg-muted/50"
                       @click="setExample('Show me my spending patterns')"
                     >
                       Show me my spending patterns this month
@@ -38,7 +42,7 @@
                     <Button
                       variant="outline"
                       size="sm"
-                      class="w-full hover:bg-muted/50"
+                      class="w-full text-xs sm:text-sm hover:bg-muted/50"
                       @click="setExample('How much did I spend on food?')"
                     >
                       How much did I spend on food?
@@ -48,24 +52,24 @@
               </div>
             </div>
 
-            <div v-else class="space-y-6">
+            <div v-else class="space-y-4 sm:space-y-6">
               <div
                 v-for="m in messages"
                 :key="m.id"
                 :class="[
-                  'group flex gap-3',
+                  'group flex gap-2 sm:gap-3',
                   m.role === 'user' ? 'justify-end' : 'justify-start items-start',
                 ]"
               >
                 <div
                   v-if="m.role !== 'user'"
-                  class="h-8 w-8 rounded-lg border bg-background/80 p-1 shadow-sm"
+                  class="h-7 w-7 sm:h-8 sm:w-8 rounded-lg border bg-background/80 p-1 shadow-sm"
                 >
                   <Bot class="h-full w-full" />
                 </div>
                 <div
                   :class="[
-                    'rounded-2xl px-4 py-3 max-w-[85%] text-sm leading-relaxed shadow-sm',
+                    'rounded-2xl px-3 py-2 sm:px-4 sm:py-3 max-w-[90%] sm:max-w-[85%] text-xs sm:text-sm leading-relaxed shadow-sm',
                     m.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted/30 dark:bg-muted/50 prose-message',
@@ -76,12 +80,14 @@
               </div>
 
               <!-- Typing Indicator -->
-              <div v-if="isLoading" class="flex gap-3 justify-start items-start">
-                <div class="h-8 w-8 rounded-lg border bg-background/80 p-1 shadow-sm">
+              <div v-if="isLoading" class="flex gap-2 sm:gap-3 justify-start items-start">
+                <div class="h-7 w-7 sm:h-8 sm:w-8 rounded-lg border bg-background/80 p-1 shadow-sm">
                   <Bot class="h-full w-full animate-pulse" />
                 </div>
-                <div class="rounded-2xl px-4 py-3 bg-muted/30 dark:bg-muted/50 shadow-sm">
-                  <div class="flex gap-1 h-5 items-center">
+                <div
+                  class="rounded-2xl px-3 py-2 sm:px-4 sm:py-3 bg-muted/30 dark:bg-muted/50 shadow-sm"
+                >
+                  <div class="flex gap-1 h-4 sm:h-5 items-center">
                     <span
                       class="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce"
                       style="animation-delay: 0ms"
@@ -101,24 +107,26 @@
           </div>
 
           <div
-            class="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4"
+            class="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-3 sm:p-4"
           >
-            <span v-if="apiError" class="text-destructive text-sm mb-3 block">{{ apiError }}</span>
-            <div class="flex items-center gap-3">
+            <span v-if="apiError" class="text-destructive text-xs sm:text-sm mb-2 sm:mb-3 block">{{
+              apiError
+            }}</span>
+            <div class="flex items-center gap-2 sm:gap-3">
               <div class="relative flex-1">
                 <Textarea
                   v-model="input"
                   placeholder="Type your message..."
-                  class="flex h-11 w-full rounded-md bg-transparent px-3 py-2 text-sm outline-none border-[1px] focus-visible:ring-1 focus-visible:ring-ring pr-12"
+                  class="flex h-9 sm:h-11 w-full rounded-md bg-transparent px-3 py-1 sm:py-2 text-xs sm:text-sm outline-none border-[1px] focus-visible:ring-1 focus-visible:ring-ring pr-9 sm:pr-12"
                   @keydown.enter.prevent="handleSubmit"
                 />
                 <Button
                   size="icon"
                   variant="ghost"
-                  class="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 hover:bg-muted/50"
+                  class="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 sm:h-9 sm:w-9 hover:bg-muted/50"
                   @click="handleSubmit"
                 >
-                  <Send class="h-4 w-4" />
+                  <Send class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </div>
@@ -131,13 +139,13 @@
     <Button
       @click="isOpen = true"
       size="icon"
-      class="fixed bottom-4 right-4 h-14 w-14 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95"
+      class="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95"
     >
       <div class="relative">
-        <MessageSquare class="h-6 w-6" />
+        <MessageSquare class="h-5 w-5 sm:h-6 sm:w-6" />
         <span
           v-if="messages.length > 0"
-          class="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground"
+          class="absolute -right-1 -top-1 flex h-3.5 w-3.5 sm:h-4 sm:w-4 items-center justify-center rounded-full bg-primary text-[8px] sm:text-[10px] text-primary-foreground"
         >
           {{ messages.length }}
         </span>
@@ -220,7 +228,7 @@ onUnmounted(() => {
 }
 
 .prose-message pre {
-  @apply bg-muted/50 p-3 rounded-lg my-2 overflow-x-auto font-mono text-sm;
+  @apply bg-muted/50 p-2 sm:p-3 rounded-lg my-2 overflow-x-auto font-mono text-xs sm:text-sm;
 }
 
 .prose-message ul,
@@ -238,37 +246,47 @@ onUnmounted(() => {
 
 .prose-message td,
 .prose-message th {
-  @apply border border-border p-2 text-sm;
+  @apply border border-border p-1 sm:p-2 text-xs sm:text-sm;
 }
 
 .prose-message code {
-  @apply bg-muted/50 px-1.5 py-0.5 rounded text-sm font-mono;
+  @apply bg-muted/50 px-1 py-0.5 rounded text-xs sm:text-sm font-mono;
 }
 
 .message-content h1,
 .message-content h2,
 .message-content h3,
 .message-content h4 {
-  @apply font-semibold text-foreground mt-4 mb-2;
+  @apply font-semibold text-foreground mt-3 sm:mt-4 mb-1 sm:mb-2;
 }
 
 .message-content h1 {
-  @apply text-2xl;
+  @apply text-xl sm:text-2xl;
 }
 
 .message-content h2 {
-  @apply text-xl;
+  @apply text-lg sm:text-xl;
 }
 
 .message-content h3 {
-  @apply text-lg;
+  @apply text-base sm:text-lg;
 }
 
 .message-content p {
-  @apply mb-2;
+  @apply mb-1 sm:mb-2;
 }
 
 .message-content p:last-child {
   @apply mb-0;
+}
+
+@media (max-width: 640px) {
+  .prose-message pre::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .prose-message pre::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded;
+  }
 }
 </style>

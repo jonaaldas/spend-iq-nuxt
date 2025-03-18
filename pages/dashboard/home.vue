@@ -31,10 +31,12 @@
       </div>
       <PlaidButton />
     </div>
-    <div v-else class="flex w-full gap-6">
-      <div class="flex flex-col w-full justify-between items-center gap-6">
+    <div v-else class="flex flex-col w-full gap-6">
+      <div class="flex flex-col w-full justify-between items-start gap-6">
         <div class="flex flex-row justify-between items-center w-full">
-          <span class="text-sm text-muted-foreground">Press CMD + K to ask questions</span>
+          <span class="text-xs sm:text-sm text-muted-foreground"
+            >Press CMD + K to ask questions</span
+          >
           <PlaidButton />
         </div>
         <Card class="w-full">
@@ -42,8 +44,8 @@
             <CardTitle>Spending by Category</CardTitle>
           </CardHeader>
           <CardContent>
-            <div class="flex flex-row w-full">
-              <div class="w-2/5 flex items-center justify-center h-[300px]">
+            <div class="flex flex-col sm:flex-row w-full">
+              <div class="w-full sm:w-2/5 flex items-center justify-center h-[250px] sm:h-[300px]">
                 <DonutChart
                   index="name"
                   :category="'total'"
@@ -51,7 +53,7 @@
                   :value-formatter="formatCurrency"
                 />
               </div>
-              <div class="w-full space-y-4 pl-6">
+              <div class="w-full space-y-4 pt-4 sm:pt-0 sm:pl-6">
                 <div class="flex flex-col gap-4">
                   <p class="text-sm text-muted-foreground">
                     Distribution of your spending across different categories
@@ -85,7 +87,9 @@
             </div>
           </CardContent>
         </Card>
-        <DataTable class="w-full" :columns="columnsTable" :data="financialData.transactions" />
+        <div class="w-full overflow-x-auto">
+          <DataTable class="w-full" :columns="columnsTable" :data="financialData.transactions" />
+        </div>
       </div>
     </div>
   </div>
