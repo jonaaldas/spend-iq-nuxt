@@ -39,11 +39,7 @@
             </div>
           </div>
 
-          <Waitlist
-            :key="renderKey"
-            afterJoinWaitlistUrl="/thank-you"
-            :appearance="{ baseTheme: theme }"
-          />
+          <Waitlist />
         </div>
       </main>
 
@@ -64,26 +60,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/toast/use-toast'
-import {
-  ArrowRight,
-  BanknoteIcon,
-  Bot,
-  LineChart,
-  Mail,
-  MessageSquare,
-  User,
-  Wallet,
-  Zap,
-  Code,
-  Server,
-} from 'lucide-vue-next'
-import { dark } from '@clerk/themes'
+import { BanknoteIcon, LineChart, MessageSquare, Wallet, Zap, Code, Server } from 'lucide-vue-next'
 
-const theme = ref<typeof dark | undefined>(undefined)
-const renderKey = ref(0)
 const features = [
   { icon: Wallet, text: 'Connect all your bank accounts' },
   { icon: MessageSquare, text: 'Get insights into your spending via Telegram' },
@@ -93,18 +71,4 @@ const features = [
   { icon: Code, text: 'Completely open source - inspect, modify, or self-host' },
   { icon: Server, text: 'Self-host for free or use our hosted service for a monthly fee' },
 ]
-
-const changeTheme = (themeString: string) => {
-  theme.value = themeString == 'dark' ? dark : undefined
-  renderKey.value++
-  return theme.value
-}
-
-onMounted(() => {
-  theme.value = localStorage.getItem('theme') || 'dark'
-})
 </script>
-
-<style>
-/* Add any custom styles here */
-</style>
