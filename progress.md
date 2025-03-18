@@ -81,3 +81,5 @@
 - Added timeout protection for Redis operations and Plaid API calls
 - Improved error handling with specific error messages for different failure modes
 - Limited data processing to prevent serverless function timeouts
+- server/api/plaid/accounts.get.ts - Optimized to reuse cached transaction data for accounts instead of making separate Plaid API calls
+- pages/dashboard/accounts.vue - Created accounts overview page with account cards, balances, and mock disconnect functionality

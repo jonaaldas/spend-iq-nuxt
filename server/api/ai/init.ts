@@ -9,19 +9,16 @@ export default defineLazyEventHandler(async () => {
   const openai = createOpenAI({ apiKey })
 
   return defineEventHandler(async event => {
-    // Set a timeout for the entire operation
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 18000) // 18-second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 18000)
 
     try {
-      const { messages } = await readBody(event)
       const { userId } = event.context.auth
 
       if (!userId) {
         throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
       }
 
-      // Fetch transactions with shorter timeout to leave time for AI processing
       const fetchPromise = cachedFetchPlaidTransactions(userId)
       const timeoutPromise = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('Transaction fetch timeout')), 10000)
@@ -58,8 +55,10 @@ export default defineLazyEventHandler(async () => {
 
       const result = streamText({
         model: openai('gpt-4o-mini'),
-        messages,
-        system: `
+        messages: [
+          {
+            role: 'system',
+            content: `
             You are a financial analyst and assistant. You will be given a list of transaction and bank account
             information in JSON format. Your goal will be to analyze each transaction and give a response base on the
             message from the user.
@@ -71,6 +70,8 @@ export default defineLazyEventHandler(async () => {
             CONTEXT: Here is the list of transaction you will analyze them and give a response based on the message from the user.
             ${transactionsString}
                     `,
+          },
+        ],
       })
 
       return result.toDataStreamResponse({

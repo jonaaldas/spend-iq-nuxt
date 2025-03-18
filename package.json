@@ -32,7 +32,7 @@
     "drizzle-orm": "^0.40.0",
     "lucide-vue-next": "^0.477.0",
     "micromark": "^4.0.2",
-    "nuxt": "^3.15.4",
+    "nuxt": "^3.16.0",
     "nuxt-lucide-icons": "1.0.5",
     "plaid": "^31.1.0",
     "reka-ui": "^2.0.2",

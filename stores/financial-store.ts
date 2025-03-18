@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+
 interface Transaction {
   transaction_id: string
   date: string
@@ -33,34 +34,31 @@ interface FinancialData {
 }
 
 export const useFinancialStore = defineStore('financial', () => {
-  const transactions = ref<Transaction[]>([])
-  const accounts = ref<Account[]>([])
-  const financialData = ref<FinancialData>({
+  // Use useState for SSR-friendly state that persists across page loads
+  const financialData = useState<FinancialData>('financial-data', () => ({
     transactions: [],
     accounts: [],
-  })
-  const isLoading = ref(true)
-  const loadingPlaid = ref(false)
-  const firstConnection = ref(true)
-  const error = ref<string | null>(null)
-
-  // Getters
-  const totalBalance = computed(() => {
-    return accounts.value.reduce((total, account) => total + (account.balances.current || 0), 0)
-  })
-
-  const sortedTransactions = computed(() => {
-    return [...transactions.value].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    )
-  })
+  }))
+  const isLoading = useState<boolean>('financial-loading', () => true)
+  const lastFetched = useState<number>('financial-last-fetched', () => 0)
 
   // Actions
-  async function fetchTransactions() {
-    error.value = null
-    loadingPlaid.value = true
-
+  async function fetchTransactions(force = false) {
     try {
+      // Check if we have cached data and it's less than 5 minutes old
+      const now = Date.now()
+      const fiveMinutes = 5 * 60 * 1000
+
+      if (
+        !force &&
+        financialData.value.accounts.length > 0 &&
+        now - lastFetched.value < fiveMinutes
+      ) {
+        isLoading.value = false
+        return financialData.value
+      }
+
+      isLoading.value = true
       const res = await $fetch<{
         success: boolean
         transactions: Transaction[]
@@ -69,43 +67,49 @@ export const useFinancialStore = defineStore('financial', () => {
 
       if (res.success && res.accounts.length > 0) {
         financialData.value = res
-        firstConnection.value = false
-        return
-      } else {
-        firstConnection.value = true
-        return {
-          success: false,
-          transactions: [],
-          accounts: [],
-        }
+        lastFetched.value = now
+        return res
+      }
+
+      return {
+        success: false,
+        transactions: [],
+        accounts: [],
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch transactions'
       console.error('Error fetching transactions:', err)
-      firstConnection.value = true
+      return {
+        success: false,
+        transactions: [],
+        accounts: [],
+      }
     } finally {
       isLoading.value = false
-      loadingPlaid.value = false
     }
   }
 
   function clearTransactions() {
-    transactions.value = []
-    accounts.value = []
+    financialData.value = {
+      transactions: [],
+      accounts: [],
+    }
+    lastFetched.value = 0
+  }
+
+  // New method to handle account disconnection
+  async function handleAccountDisconnected() {
+    // Force refresh data to get updated account list
+    await fetchTransactions(true)
   }
 
   return {
     // State
     financialData,
     isLoading,
-    error,
-    loadingPlaid,
-    firstConnection,
-    // Getters
-    totalBalance,
-    sortedTransactions,
+    lastFetched,
     // Actions
     fetchTransactions,
     clearTransactions,
+    handleAccountDisconnected,
   }
 })

@@ -33,7 +33,7 @@
                       class="w-full hover:bg-muted/50"
                       @click="setExample('Show me my spending patterns')"
                     >
-                      Show me my spending patterns
+                      Show me my spending patterns this month
                     </Button>
                     <Button
                       variant="outline"
@@ -71,10 +71,7 @@
                       : 'bg-muted/30 dark:bg-muted/50 prose-message',
                   ]"
                 >
-                  <div
-                    class="whitespace-pre-wrap message-content"
-                    v-html="formatMessage(m.content)"
-                  ></div>
+                  <div class="message-content" v-html="formatMessage(m.content)"></div>
                 </div>
               </div>
 
@@ -204,7 +201,7 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('keydown', handleKeydown)
 })
 

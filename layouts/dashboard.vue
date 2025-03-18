@@ -13,8 +13,10 @@ import {
   type SidebarProps,
 } from '@/components/ui/sidebar'
 
-import { GalleryVerticalEnd } from 'lucide-vue-next'
 import ChatBot from '@/components/ChatBot.vue'
+import { useFinancialStore } from '@/stores/financial-store'
+const financialStore = useFinancialStore()
+
 const props = withDefaults(defineProps<SidebarProps>(), {
   variant: 'floating',
 })
@@ -24,6 +26,7 @@ interface NavItem {
   url: string
   isActive?: boolean
   items: NavItem[]
+  id: string
 }
 
 const data = {
@@ -32,9 +35,23 @@ const data = {
       title: 'Home',
       url: '/dashboard/home',
       items: [],
+      id: 'home_tab',
+    },
+    {
+      title: 'Accounts',
+      url: '/dashboard/accounts',
+      items: [],
+      id: 'accounts_tab',
     },
   ] as NavItem[],
 }
+
+onMounted(async () => {
+  await callOnce('financialStore.fetchTransactions', () => {
+    console.log('fetching transactions')
+    financialStore.fetchTransactions()
+  })
+})
 </script>
 
 <template>
@@ -74,7 +91,7 @@ const data = {
             <SidebarMenu class="gap-2">
               <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
                 <SidebarMenuButton as-child>
-                  <a :href="item.url" class="font-medium">
+                  <a :href="item.url" class="font-medium" :id="item.id">
                     {{ item.title }}
                   </a>
                 </SidebarMenuButton>
@@ -94,7 +111,7 @@ const data = {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <main class="mt-16 flex h-full flex-col w-full container mx-auto max-w-screen-lg">
+      <main class="mt-16 flex h-full w-full max-w-screen-lg mx-auto px-4">
         <slot></slot>
       </main>
       <ChatBot />

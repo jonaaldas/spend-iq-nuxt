@@ -1,5 +1,5 @@
 <template>
-  <!-- <div v-if="isLoading" class="flex flex-col gap-8">
+  <div v-if="isLoading" class="flex flex-col gap-8 w-full">
     <div class="flex flex-col gap-4">
       <Skeleton class="h-8 w-48" />
       <div class="flex flex-col gap-2">
@@ -20,78 +20,73 @@
     </div>
   </div>
 
-  <div
-    v-else-if="firstConnection == true"
-    class="flex flex-col gap-4 items-center justify-center min-h-[50vh]"
-  >
-    <div class="text-center mb-8">
-      <h2 class="text-2xl font-semibold mb-2">Connect Your Bank Account</h2>
-      <p class="text-muted-foreground">Link your bank account to start tracking your expenses</p>
+  <div v-else class="w-full">
+    <div
+      v-if="financialData.accounts.length == 0"
+      class="flex flex-col gap-4 items-center justify-center min-h-[50vh] w-full"
+    >
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-semibold mb-2">Connect Your Bank Account</h2>
+        <p class="text-muted-foreground">Link your bank account to start tracking your expenses</p>
+      </div>
+      <PlaidButton />
     </div>
-    <Button @click="handleClick" :disabled="loadingPlaid" size="lg">
-      {{ loadingPlaid ? 'Connecting...' : 'Connect Bank Account' }}
-    </Button>
-  </div>
-
-  <div v-else class="flex flex-col w-full gap-6">
-    <div class="flex justify-between items-center">
-      <span class="text-sm text-muted-foreground">Press CMD + K to ask questions</span>
-      <Button @click="handleClick" size="sm">
-        {{ loadingPlaid ? 'Connecting...' : 'Connect Another Bank Account' }}
-      </Button>
-    </div>
-    <Card>
-      <CardHeader>
-        <CardTitle>Spending by Category</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-row w-full">
-          <div class="w-2/5 flex items-center justify-center h-[300px]">
-            <Donut
-              :data="categoryData"
-              category="value"
-              index="name"
-              :value-formatter="formatCurrency"
-            />
-          </div>
-          <div class="w-full space-y-4 pl-6">
-            <div class="flex flex-col gap-4">
-              <p class="text-sm text-muted-foreground">
-                Distribution of your spending across different categories
-              </p>
-
-              <div class="space-y-3 mt-2">
-                <h3 class="text-sm font-medium">Top Categories</h3>
-                <div
-                  v-for="category in categoryData.slice(0, 5)"
-                  :key="category.name"
-                  class="flex items-center justify-between"
-                >
-                  <div class="space-y-1">
-                    <p class="text-sm font-medium leading-none">{{ category.name }}</p>
-                  </div>
-                  <div class="font-medium">{{ formatCurrency(category.value) }}</div>
-                </div>
+    <div v-else class="flex w-full gap-6">
+      <div class="flex flex-col w-full justify-between items-center gap-6">
+        <div class="flex flex-row justify-between items-center w-full">
+          <span class="text-sm text-muted-foreground">Press CMD + K to ask questions</span>
+          <PlaidButton />
+        </div>
+        <Card class="w-full">
+          <CardHeader>
+            <CardTitle>Spending by Category</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="flex flex-row w-full">
+              <div class="w-2/5 flex items-center justify-center h-[300px]">
+                <Donut
+                  :data="categoryData"
+                  category="value"
+                  index="name"
+                  :value-formatter="formatCurrency"
+                />
               </div>
-
-              <div class="pt-4 mt-4 border-t">
-                <div class="flex items-center justify-between">
-                  <div class="space-y-1">
-                    <p class="text-sm font-medium leading-none">Total Balance</p>
-                    <p class="text-sm text-muted-foreground">Available across all accounts</p>
+              <div class="w-full space-y-4 pl-6">
+                <div class="flex flex-col gap-4">
+                  <p class="text-sm text-muted-foreground">
+                    Distribution of your spending across different categories
+                  </p>
+                  <div class="space-y-3 mt-2">
+                    <h3 class="text-sm font-medium">Top Categories</h3>
+                    <div
+                      v-for="category in categoryData.slice(0, 5)"
+                      :key="category.name"
+                      class="flex items-center justify-between"
+                    >
+                      <div class="space-y-1">
+                        <p class="text-sm font-medium leading-none">{{ category.name }}</p>
+                      </div>
+                      <div class="font-medium">{{ formatCurrency(category.value) }}</div>
+                    </div>
                   </div>
-                  <div class="font-medium">{{ formatCurrency(totalBalance) }}</div>
+                  <div class="pt-4 mt-4 border-t">
+                    <div class="flex items-center justify-between">
+                      <div class="space-y-1">
+                        <p class="text-sm font-medium leading-none">Total Balance</p>
+                        <p class="text-sm text-muted-foreground">Available across all accounts</p>
+                      </div>
+                      <div class="font-medium">{{ formatCurrency(totalBalance) }}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-    <DataTable :columns="columnsTable" :data="financialData.transactions" />
-  </div> -->
-
-  <div>Home</div>
+          </CardContent>
+        </Card>
+        <DataTable class="w-full" :columns="columnsTable" :data="financialData.transactions" />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -116,7 +111,7 @@ import { ArrowUpDown, ChevronDown } from 'lucide-vue-next'
 import DataTable from '@/components/dataTable/datatable.vue'
 
 const financialStore = useFinancialStore()
-const { financialData, isLoading, loadingPlaid, firstConnection } = storeToRefs(financialStore)
+const { financialData, isLoading } = storeToRefs(financialStore)
 const columnsTable = ref<any[]>([])
 
 const totalBalance = computed(() => {
@@ -183,7 +178,6 @@ const formatCurrency = (amount: number) => {
 }
 
 const handleClick = async () => {
-  loadingPlaid.value = true
   const data = await $fetch('/api/plaid/create-link-token', {
     method: 'POST',
   })
@@ -206,10 +200,15 @@ const handleClick = async () => {
 
   const handler = window.Plaid.create(config)
   handler.open()
-  loadingPlaid.value = false
 }
 
 const generateColumns = () => {
+  const columns = localStorage.getItem('columns')
+  if (columns) {
+    columnsTable.value = JSON.parse(columns)
+    return
+  }
+
   const columnKeys = [
     'name',
     'amount',
@@ -274,17 +273,15 @@ const generateColumns = () => {
       }
     }
   })
+  // store columns in local storage
+  localStorage.setItem('columns', JSON.stringify(columnsTable.value))
 }
 
 onMounted(async () => {
-  isLoading.value = true
   try {
-    await financialStore.fetchTransactions()
     generateColumns()
   } catch (error) {
     console.error('Error fetching transactions:', error)
-  } finally {
-    isLoading.value = false
   }
 })
 </script>
