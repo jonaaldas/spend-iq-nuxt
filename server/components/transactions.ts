@@ -215,38 +215,30 @@ export const cachedFetchPlaidTransactions = async (
 ): Promise<PlaidTransactionsResponse> => {
   const cacheKey = getCacheKey(userId)
 
-  try {
-    // Try to get data from cache with timeout
-    const { data: cachedData, error } = await tryCatch(useStorage('redis').getItem(cacheKey))
+  // Try to get data from cache with timeout
+  const { data: cachedData, error } = await tryCatch(useStorage('redis').getItem(cacheKey))
+  console.log('🚀 ~ error:', error)
 
-    if (cachedData) {
-      console.log('Cache hit')
-      return cachedData as PlaidTransactionsResponse
-    }
-
-    const { data, error: fetchError } = await tryCatch(fetchPlaidTransactions(userId))
-
-    if (fetchError) {
-      throw fetchError
-    }
-
-    const { data: setCacheData, error: setCacheError } = await tryCatch(
-      useStorage('redis').setItem(cacheKey, data)
-    )
-
-    if (setCacheError) {
-      throw setCacheError
-    }
-
-    return data
-  } catch (error) {
-    console.error('Error in cachedFetchPlaidTransactions:', error)
-
-    // If we have a cache error, try direct fetch as fallback
-    if (error instanceof Error && error.message.includes('Redis')) {
-      return fetchPlaidTransactions(userId)
-    }
-
-    throw error
+  if (cachedData) {
+    console.log('Cache hit')
+    return cachedData as PlaidTransactionsResponse
   }
+
+  const { data, error: fetchError } = await tryCatch(fetchPlaidTransactions(userId))
+
+  if (fetchError) {
+    console.log('🚀 ~ fetchError:', fetchError)
+    throw fetchError
+  }
+
+  const { data: setCacheData, error: setCacheError } = await tryCatch(
+    useStorage('redis').setItem(cacheKey, data)
+  )
+
+  if (setCacheError) {
+    console.log('🚀 ~ setCacheError:', setCacheError)
+    throw setCacheError
+  }
+
+  return data
 }
