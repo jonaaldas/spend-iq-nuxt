@@ -4,7 +4,7 @@
       <h1 class="text-xl sm:text-2xl font-semibold tracking-tight">Connected Accounts</h1>
     </div>
 
-    <div v-if="pending" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div v-if="isLoading" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <Card v-for="i in 3" :key="i" class="p-6">
         <Skeleton class="h-4 w-32 mb-4" />
         <Skeleton class="h-8 w-48 mb-2" />
@@ -12,11 +12,10 @@
       </Card>
     </div>
 
-    <div v-else-if="error" class="rounded-lg border p-4">
-      <p class="text-sm text-muted-foreground">Failed to load accounts. Please try again later.</p>
-    </div>
-
-    <div v-else-if="data?.accounts?.length === 0" class="rounded-lg border p-6 sm:p-8 text-center">
+    <div
+      v-else-if="financialData?.accounts?.length === 0"
+      class="rounded-lg border p-6 sm:p-8 text-center"
+    >
       <BuildingIcon class="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground/50" />
       <h2 class="mt-4 text-lg font-semibold">No accounts connected</h2>
       <p class="mt-2 text-sm text-muted-foreground">Connect your first bank to get started.</p>
@@ -24,7 +23,7 @@
     </div>
 
     <div v-else class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      <Card v-for="account in data?.accounts" :key="account.account_id" class="relative">
+      <Card v-for="account in financialData?.accounts" :key="account.account_id" class="relative">
         <CardHeader>
           <div class="flex items-start justify-between">
             <div class="max-w-[75%]">
@@ -70,9 +69,11 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon, BuildingIcon, MoreVerticalIcon, LogOutIcon } from 'lucide-vue-next'
+import { BuildingIcon, MoreVerticalIcon, LogOutIcon } from 'lucide-vue-next'
 import { useFinancialStore } from '@/stores/financial-store'
+import { useToast } from '@/components/ui/toast/use-toast'
 
+const { toast } = useToast()
 interface Account {
   account_id: string
   name: string
@@ -98,9 +99,8 @@ definePageMeta({
   layout: 'dashboard',
 })
 
-const { data, pending, error } = await useFetch<AccountsResponse>('/api/plaid/accounts')
 const financialStore = useFinancialStore()
-
+const { financialData, isLoading } = storeToRefs(financialStore)
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -127,7 +127,6 @@ const formatAccountSubtype = (subtype: string) => {
 }
 
 const disconnectAccount = async (account: Account) => {
-  const { error: showError, success: showSuccess } = useToast()
   try {
     const res = await $fetch<{ success: boolean; message: string }>('/api/plaid/disconnect', {
       method: 'POST',
@@ -136,13 +135,18 @@ const disconnectAccount = async (account: Account) => {
 
     if (res.success) {
       // Refresh both the accounts list and transactions data
-      await refreshNuxtData('accounts')
       await financialStore.handleAccountDisconnected()
-      showSuccess(`Successfully disconnected ${account.name}`)
+      toast({
+        title: `Successfully disconnected ${account.name}`,
+        description: 'You can reconnect it anytime.',
+      })
     }
   } catch (err) {
     console.error('Error disconnecting account:', err)
-    showError('Failed to disconnect account. Please try again.')
+    toast({
+      title: 'Failed to disconnect account. Please try again.',
+      description: 'Please try again.',
+    })
   }
 }
 </script>

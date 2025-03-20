@@ -47,10 +47,7 @@ const data = {
 }
 
 onMounted(async () => {
-  await callOnce('financialStore.fetchTransactions', () => {
-    console.log('fetching transactions')
-    financialStore.fetchTransactions()
-  })
+  financialStore.fetchTransactions()
 })
 </script>
 
@@ -111,7 +108,7 @@ onMounted(async () => {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <main class="mt-16 flex h-full w-full max-w-screen-2xl mx-auto px-4">
+      <main class="mt-16 flex h-full w-full max-w-screen-xl mx-auto px-4">
         <slot></slot>
       </main>
       <ChatBot />

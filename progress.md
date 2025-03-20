@@ -89,3 +89,12 @@
 - pages/dashboard/home.vue - Added responsive layout for mobile/desktop, fixed chart layout, added overflow handling for tables
 - pages/dashboard/accounts.vue - Improved grid layout, adjusted spacing and text sizes for mobile
 - components/ChatBot.vue - Made dialog, text, buttons and inputs responsive for all screen sizes
+
+## 2024-06-03
+- Fixed promise handling in transactions component
+- server/components/transactions.ts - Fixed type error by removing redundant await in withTimeout call
+- server/components/transactions.ts - Fixed array property access in Promise.all result handling
+- layouts/dashboard.vue - Fixed infinite recursion error by removing callOnce wrapper around fetchTransactions
+- stores/financial-store.ts - Fixed maximum recursive updates error by properly cloning data before assignment
+- pages/dashboard/home.vue - Fixed DonutChart rendering by simplifying data flow and using isChartReady flag
+- stores/financial-store.ts - Updated Transaction interface with proper personal_finance_category fields

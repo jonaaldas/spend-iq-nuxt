@@ -1,7 +1,10 @@
 import { db } from '~/server/database/turso'
 import { plaidItems } from '~/server/database/schema'
 import { eq, and } from 'drizzle-orm'
-import { clearTransactionsCache } from '~/server/components/transactions'
+import {
+  cachedFetchPlaidTransactions,
+  clearTransactionsCache,
+} from '~/server/components/transactions'
 import { client } from '~/server/lib/plaid'
 
 export default defineEventHandler(async event => {
@@ -17,13 +20,11 @@ export default defineEventHandler(async event => {
   }
 
   try {
-    // Find the access token for this item
     const item = await db
       .select()
       .from(plaidItems)
       .where(and(eq(plaidItems.userId, userId), eq(plaidItems.itemId, itemId)))
 
-    console.log('🚀 ~ item:', item)
     if (!item) {
       throw createError({
         statusCode: 404,
@@ -31,18 +32,31 @@ export default defineEventHandler(async event => {
       })
     }
 
-    // Remove the item from Plaid
     await client.itemRemove({
       access_token: item[0].accessToken,
     })
 
-    // Delete the item from our database
     await db
       .delete(plaidItems)
       .where(and(eq(plaidItems.userId, userId), eq(plaidItems.itemId, itemId)))
 
-    // Clear the transactions cache
-    await clearTransactionsCache(userId)
+    const { success, error } = await clearTransactionsCache(userId)
+
+    if (!success) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Failed to clear transactions cache',
+      })
+    }
+
+    const { data: data, error: error2 } = await tryCatch(cachedFetchPlaidTransactions(userId))
+
+    if (error2) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Failed to fetch transactions',
+      })
+    }
 
     return {
       success: true,

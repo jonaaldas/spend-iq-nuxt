@@ -1,19 +1,31 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-interface Transaction {
-  transaction_id: string
-  date: string
-  merchant_name?: string
-  name: string
-  amount: number
-  pending: boolean
+export interface Transaction {
   account_id: string
-  logo_url?: string
-  personal_finance_category?: {
+  amount: number
+  iso_currency_code: string
+  category: string[]
+  category_id: string
+  date: string
+  authorized_date: string | null
+  location: {
+    address: string | null
+    city: string | null
+    region: string | null
+    postal_code: string | null
+    country: string | null
+  }
+  merchant_name: string | null
+  name: string
+  payment_channel: string
+  pending: boolean
+  personal_finance_category: {
     detailed: string
+    primary: string
     icon_url?: string
   }
+  transaction_id: string
 }
 
 interface Account {
@@ -34,17 +46,25 @@ interface FinancialData {
 }
 
 export const useFinancialStore = defineStore('financial', () => {
-  // Use useState for SSR-friendly state that persists across page loads
-  const financialData = useState<FinancialData>('financial-data', () => ({
+  // Replace useState with ref for Pinia-managed state
+  const financialData = ref<FinancialData>({
     transactions: [],
     accounts: [],
-  }))
-  const isLoading = useState<boolean>('financial-loading', () => true)
-  const lastFetched = useState<number>('financial-last-fetched', () => 0)
+  })
+  const isLoading = ref(true)
+  const lastFetched = ref(0)
+
+  // Add a flag to prevent multiple simultaneous fetches
+  const isFetching = ref(false)
 
   // Actions
   async function fetchTransactions(force = false) {
     try {
+      // Check if we're already fetching
+      if (isFetching.value) {
+        return financialData.value
+      }
+
       // Check if we have cached data and it's less than 5 minutes old
       const now = Date.now()
       const fiveMinutes = 5 * 60 * 1000
@@ -58,7 +78,9 @@ export const useFinancialStore = defineStore('financial', () => {
         return financialData.value
       }
 
+      isFetching.value = true
       isLoading.value = true
+
       const res = await $fetch<{
         success: boolean
         transactions: Transaction[]
@@ -66,9 +88,17 @@ export const useFinancialStore = defineStore('financial', () => {
       }>('/api/plaid/transactions')
 
       if (res.success && res.accounts.length > 0) {
-        financialData.value = res
+        // Clone data before assigning to break reactive chain
+        const transactions = [...res.transactions]
+        const accounts = [...res.accounts]
+
+        // Update state in a single operation
+        financialData.value = {
+          transactions,
+          accounts,
+        }
         lastFetched.value = now
-        return res
+        return { transactions, accounts }
       }
 
       return {
@@ -85,6 +115,7 @@ export const useFinancialStore = defineStore('financial', () => {
       }
     } finally {
       isLoading.value = false
+      isFetching.value = false
     }
   }
 
@@ -98,7 +129,6 @@ export const useFinancialStore = defineStore('financial', () => {
 
   // New method to handle account disconnection
   async function handleAccountDisconnected() {
-    // Force refresh data to get updated account list
     await fetchTransactions(true)
   }
 

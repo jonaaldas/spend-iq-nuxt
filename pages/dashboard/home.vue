@@ -47,6 +47,7 @@
             <div class="flex flex-col sm:flex-row w-full">
               <div class="w-full sm:w-2/5 flex items-center justify-center h-[250px] sm:h-[300px]">
                 <DonutChart
+                  v-if="categoryData.length > 0"
                   index="name"
                   :category="'total'"
                   :data="categoryData"
@@ -115,10 +116,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useFinancialStore } from '@/stores/financial-store'
 import { ArrowUpDown, ChevronDown } from 'lucide-vue-next'
 import DataTable from '@/components/dataTable/datatable.vue'
+import DonutChart from '@/components/ui/chart-donut/DonutChart.vue'
+import { ref, computed, onMounted, h, type VNode } from 'vue'
+import type { ColumnDef } from '@tanstack/vue-table'
 
 const financialStore = useFinancialStore()
 const { financialData, isLoading } = storeToRefs(financialStore)
-const columnsTable = ref<any[]>([])
+const columnsTable = ref<ColumnDef<any, any>[]>([])
+const isChartReady = ref(false)
 
 const totalBalance = computed(() => {
   if (!financialData.value?.accounts?.length) return 0
@@ -158,23 +163,11 @@ const categoryData = computed(() => {
       }
     }
   })
-  console.log(categoryMap)
 
-  // Convert map to array and sort by value (descending)
   const result = Array.from(categoryMap.entries())
     .map(([name, value]) => ({ name, total: Number(value) }))
     .sort((a, b) => b.total - a.total)
-
-  // Take top 8 categories and group the rest as "Other"
-  if (result.length > 8) {
-    const topCategories = result.slice(0, 7)
-    const otherCategories = result.slice(7)
-    const otherSum = otherCategories.reduce((sum, cat) => sum + cat.total, 0)
-
-    return [...topCategories, { name: 'Other', total: otherSum }]
-  }
-
-  console.log(result)
+    .slice(0, 8)
 
   return result
 })
@@ -187,12 +180,6 @@ const formatCurrency = (amount: number) => {
 }
 
 const generateColumns = () => {
-  const columns = localStorage.getItem('columns')
-  if (columns) {
-    columnsTable.value = JSON.parse(columns)
-    return
-  }
-
   const columnKeys = [
     'name',
     'amount',
@@ -208,63 +195,50 @@ const generateColumns = () => {
     'pending',
   ]
 
-  columnsTable.value = columnKeys.map((key: string) => {
-    if (key == 'logo_url') {
-      return {
-        accessorKey: key,
-        header: () => h('div', { class: 'text-center' }, key),
-        cell: ({ row }: { row: any }) => {
-          const value = row.getValue(key)
-          if (value == null) return h('div', { class: 'text-center font-medium' }, 'N/A')
-          return h('img', {
-            src: value,
-            class: 'w-10 h-10 rounded-full',
-          })
+  columnsTable.value = columnKeys.map((key: string) => ({
+    id: key,
+    accessorKey: key,
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: 'ghost',
+          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
+        () => [h('span', {}, key), h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
+      )
+    },
+    cell: ({ row }) => {
+      const value = row.getValue(key)
+      if (key === 'logo_url') {
+        if (!value) return h('div', { class: 'text-center font-medium' }, 'N/A')
+        return h('img', {
+          src: value as string,
+          class: 'w-10 h-10 rounded-full',
+          alt: 'logo',
+        })
       }
-    } else {
-      return {
-        accessorKey: key,
-        header: ({ column }: { column: any }) =>
-          h(
-            Button,
-            {
-              variant: 'ghost',
-              onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-            },
-            () => [key, h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
-          ),
-        cell: ({ row }: { row: any }) => {
-          const value = row.getValue(key)
-          if (typeof value == 'number') {
-            if (value > 0) {
-              return h(
-                'div',
-                { class: 'text-center font-medium text-green-500' },
-                formatCurrency(value)
-              )
-            } else {
-              return h(
-                'div',
-                { class: 'text-center font-medium text-red-500' },
-                formatCurrency(value)
-              )
-            }
-          }
-          return h('div', { class: 'text-center font-medium' }, value)
-        },
+      if (typeof value === 'number') {
+        return h(
+          'div',
+          {
+            class:
+              value > 0
+                ? 'text-center font-medium text-green-500'
+                : 'text-center font-medium text-red-500',
+          },
+          formatCurrency(value)
+        )
       }
-    }
-  })
-  // store columns in local storage
-  localStorage.setItem('columns', JSON.stringify(columnsTable.value))
+      if (typeof value === 'object' && value !== null) {
+        return h('div', { class: 'text-center font-medium' }, JSON.stringify(value))
+      }
+      return h('div', { class: 'text-center font-medium' }, String(value))
+    },
+  }))
 }
 
-onMounted(async () => {
-  try {
-    generateColumns()
-  } catch (error) {
-    console.error('Error fetching transactions:', error)
-  }
+onMounted(() => {
+  generateColumns()
 })
 </script>

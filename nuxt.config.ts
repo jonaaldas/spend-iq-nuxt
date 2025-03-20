@@ -27,5 +27,14 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     openaiApiKey: process.env.NUXT_OPENAI_API_KEY,
+    redisUrl: process.env.NUXT_REDIS_URL,
+  },
+  nitro: {
+    storage: {
+      redis: {
+        driver: 'redis',
+        url: process.env.NUXT_REDIS_URL,
+      },
+    },
   },
 })

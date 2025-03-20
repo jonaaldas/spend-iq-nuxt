@@ -56,11 +56,13 @@ export const fetchPlaidTransactions = async (
 
   try {
     // Add timeout to database query
-    const usersAccessTokens = await withTimeout(
-      db.select().from(plaidItems).where(eq(plaidItems.userId, userId)),
-      5000, // 5 second timeout
-      'Database query timed out'
+    const { data: usersAccessTokens, error } = await tryCatch(
+      db.select().from(plaidItems).where(eq(plaidItems.userId, userId))
     )
+
+    if (error) {
+      throw error
+    }
 
     if (usersAccessTokens.length === 0) {
       throw new Error('No linked bank accounts found')
@@ -79,85 +81,98 @@ export const fetchPlaidTransactions = async (
     const maxItemsToProcess = Math.min(usersAccessTokens.length, 3)
 
     // Process items concurrently with Promise.all for better performance
-    await Promise.all(
-      usersAccessTokens.slice(0, maxItemsToProcess).map(async item => {
-        try {
-          const accessToken = item.accessToken
+    const { error: processedItemsError } = await tryCatch(
+      Promise.all(
+        usersAccessTokens.slice(0, maxItemsToProcess).map(async item => {
+          try {
+            const accessToken = item.accessToken
 
-          let hasMore = true
-          let cursor: string | undefined = undefined
-          let itemTransactions: any[] = []
-          let fetchAttempts = 0
-          const maxFetchAttempts = 2
+            let hasMore = true
+            let cursor: string | undefined = undefined
+            let itemTransactions: any[] = []
+            let fetchAttempts = 0
+            const maxFetchAttempts = 2
 
-          while (hasMore && fetchAttempts < maxFetchAttempts) {
-            try {
-              // Add timeout to Plaid API call
-              const transactionsResponse: { data: TransactionsSyncResponse } = await withTimeout(
-                client.transactionsSync({
-                  access_token: accessToken,
-                  cursor: cursor,
-                  count: 50, // Reduced from 100 for faster response
-                }),
-                8000, // 8 second timeout
-                `Plaid transactionsSync timed out for item ${item.itemId}`
-              )
+            while (hasMore && fetchAttempts < maxFetchAttempts) {
+              try {
+                // Add timeout to Plaid API call
+                const transactionsResponse: { data: TransactionsSyncResponse } = await withTimeout(
+                  client.transactionsSync({
+                    access_token: accessToken,
+                    cursor: cursor,
+                    count: 50, // Reduced from 100 for faster response
+                  }),
+                  8000, // 8 second timeout
+                  `Plaid transactionsSync timed out for item ${item.itemId}`
+                )
 
-              const { added, has_more, next_cursor } = transactionsResponse.data
+                const { added, has_more, next_cursor } = transactionsResponse.data
 
-              // Add transactions to our collection
-              itemTransactions = [...itemTransactions, ...added]
+                // Add transactions to our collection
+                itemTransactions = [...itemTransactions, ...added]
 
-              // Update pagination state
-              hasMore = has_more
-              cursor = next_cursor
-              fetchAttempts++
+                // Update pagination state
+                hasMore = has_more
+                cursor = next_cursor
+                fetchAttempts++
 
-              // Break earlier with fewer transactions to avoid timeouts
-              if (itemTransactions.length > 100) {
+                // Break earlier with fewer transactions to avoid timeouts
+                if (itemTransactions.length > 100) {
+                  hasMore = false
+                  break
+                }
+              } catch (error) {
+                console.error(`Error in transaction sync for item ${item.itemId}:`, error)
                 hasMore = false
-                break
               }
-            } catch (error) {
-              console.error(`Error in transaction sync for item ${item.itemId}:`, error)
-              hasMore = false
             }
-          }
 
-          // Get accounts with timeout
-          const accountsResponse: { data: AccountsGetResponse } = await withTimeout(
-            client.accountsGet({
-              access_token: accessToken,
-            }),
-            5000, // 5 second timeout
-            `Plaid accountsGet timed out for item ${item.itemId}`
-          )
+            // Get accounts with timeout
+            const accountsResponse: { data: AccountsGetResponse } = await withTimeout(
+              client.accountsGet({
+                access_token: accessToken,
+              }),
+              5000, // 5 second timeout
+              `Plaid accountsGet timed out for item ${item.itemId}`
+            )
 
-          // Store institution info
-          institutions[item.institutionId] = {
-            name: item.institutionName,
-            institution_id: item.institutionId,
-          }
-
-          // Attach institution info to accounts
-          const accountsWithInstitution = accountsResponse.data.accounts.map(account => ({
-            ...account,
-            institution: {
+            // Store institution info
+            institutions[item.institutionId] = {
               name: item.institutionName,
               institution_id: item.institutionId,
-            },
-            item_id: item.itemId,
-          }))
+            }
 
-          // Add to collections
-          allAccounts.push(...accountsWithInstitution)
-          allTransactions.push(...itemTransactions)
-        } catch (error) {
-          console.error(`Error fetching data for item ${item.itemId}:`, error)
-          // Continue with other items even if one fails
-        }
-      })
+            // Attach institution info to accounts
+            const accountsWithInstitution = accountsResponse.data.accounts.map(account => ({
+              ...account,
+              institution: {
+                name: item.institutionName,
+                institution_id: item.institutionId,
+              },
+              item_id: item.itemId,
+            }))
+
+            // Add to collections
+            allAccounts.push(...accountsWithInstitution)
+            allTransactions.push(...itemTransactions)
+
+            return {
+              success: true,
+              transactions: allTransactions,
+              accounts: allAccounts,
+              institutions: institutions,
+            }
+          } catch (error) {
+            console.error(`Error fetching data for item ${item.itemId}:`, error)
+            // Continue with other items even if one fails
+          }
+        })
+      )
     )
+
+    if (processedItemsError) {
+      throw processedItemsError
+    }
 
     return {
       success: true,
@@ -176,17 +191,22 @@ export const fetchPlaidTransactions = async (
   }
 }
 
-export const clearTransactionsCache = async (userId: string): Promise<void> => {
-  try {
-    const cacheKey = getCacheKey(userId)
-    await withTimeout(
-      redis.del(cacheKey),
-      3000, // 3 second timeout
-      'Redis delete operation timed out'
-    )
-  } catch (error) {
-    console.error('Error clearing cache:', error)
-    // Don't throw error on cache clear failures to prevent blocking the main flow
+export const clearTransactionsCache = async (
+  userId: string
+): Promise<{
+  success: boolean
+  error?: Error | null
+}> => {
+  const cacheKey = getCacheKey(userId)
+  const { error } = await tryCatch(redis.del(cacheKey))
+  if (error) {
+    return {
+      success: false,
+      error: error,
+    }
+  }
+  return {
+    success: true,
   }
 }
 
@@ -197,29 +217,26 @@ export const cachedFetchPlaidTransactions = async (
 
   try {
     // Try to get data from cache with timeout
-    const cachedData = await withTimeout(
-      redis.get(cacheKey),
-      3000, // 3 second timeout
-      'Redis get operation timed out'
-    )
+    const { data: cachedData, error } = await tryCatch(useStorage('redis').getItem(cacheKey))
 
     if (cachedData) {
-      try {
-        return JSON.parse(cachedData)
-      } catch (parseError) {
-        console.error('Error parsing cached data:', parseError)
-        // Continue to fetch fresh data if parsing fails
-      }
+      console.log('Cache hit')
+      return cachedData as PlaidTransactionsResponse
     }
 
-    // If not in cache, fetch fresh data
-    const data = await fetchPlaidTransactions(userId)
+    const { data, error: fetchError } = await tryCatch(fetchPlaidTransactions(userId))
 
-    // Store in cache for 1 hour (3600 seconds), but don't await this operation
-    // to prevent blocking the response
-    redis
-      .set(cacheKey, JSON.stringify(data), 'EX', 3600)
-      .catch(error => console.error('Error setting cache:', error))
+    if (fetchError) {
+      throw fetchError
+    }
+
+    const { data: setCacheData, error: setCacheError } = await tryCatch(
+      useStorage('redis').setItem(cacheKey, data)
+    )
+
+    if (setCacheError) {
+      throw setCacheError
+    }
 
     return data
   } catch (error) {

@@ -4,7 +4,7 @@
       <main class="flex-1 flex flex-col items-center justify-center max-w-4xl mx-auto w-full py-12">
         <div class="text-center mb-8">
           <h1 class="text-4xl md:text-5xl font-bold mb-3">
-            Use AI to ask questions about your spending
+            Use AI to ask questions about your spending -
             <span
               class="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-600 bg-clip-text text-transparent"
             >
@@ -59,18 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import {
-  BanknoteIcon,
-  Bot,
-  LineChart,
-  MessageSquare,
-  Wallet,
-  Zap,
-  Code,
-  Server,
-} from 'lucide-vue-next'
-import { dark } from '@clerk/themes'
+import { BanknoteIcon, LineChart, MessageSquare, Wallet, Zap, Code, Server } from 'lucide-vue-next'
 
 const features = [
   { icon: Wallet, text: 'Connect all your bank accounts' },
