@@ -220,7 +220,7 @@ export const cachedFetchPlaidTransactions = async (
   console.log('🚀 ~ error:', error)
 
   if (cachedData) {
-    console.log('Cache hit')
+    console.log('Cache hit 123')
     return cachedData as PlaidTransactionsResponse
   }
 
