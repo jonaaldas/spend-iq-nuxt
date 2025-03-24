@@ -10,7 +10,4 @@ export default defineNuxtConfig({
   tailwindcss: {
     cssPath: './assets/css/global.css',
   },
-  clerk: {
-    skipServerMiddleware: true,
-  },
 })
