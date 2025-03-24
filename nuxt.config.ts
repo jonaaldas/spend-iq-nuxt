@@ -1,8 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@clerk/nuxt', '@nuxtjs/color-mode'],
+  devtools: { enabled: false },
+  modules: [
+    '@nuxtjs/tailwindcss',
+    'shadcn-nuxt',
+    '@clerk/nuxt',
+    '@nuxtjs/color-mode',
+    'nuxt-lucide-icons',
+    '@pinia/nuxt',
+  ],
   shadcn: {
     prefix: '',
     componentDir: './components/ui',
@@ -11,6 +18,23 @@ export default defineNuxtConfig({
     cssPath: './assets/css/global.css',
   },
   clerk: {
-    skipServerMiddleware: true,
+    skipServerMiddleware: false,
+    signInUrl: process.env.NUXT_CLERK_SIGN_IN_URL,
+    signUpUrl: process.env.NUXT_CLERK_SIGN_UP_URL,
+    signInForceRedirectUrl: process.env.NUXT_CLERK_SIGN_IN_FORCE_REDIRECT_URL,
+    signUpForceRedirectUrl: process.env.NUXT_CLERK_SIGN_UP_FORCE_REDIRECT_URL,
+    afterSignOutUrl: '/sign-in',
+  },
+  runtimeConfig: {
+    openaiApiKey: process.env.NUXT_OPENAI_API_KEY,
+    redisUrl: process.env.NUXT_REDIS_URL,
+  },
+  nitro: {
+    storage: {
+      redis: {
+        driver: 'redis',
+        url: process.env.NUXT_REDIS_URL,
+      },
+    },
   },
 })

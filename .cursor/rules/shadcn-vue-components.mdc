@@ -1,0 +1,9 @@
+---
+description: Only use shadcn vue componntvu
+globs: 
+alwaysApply: false
+---
+            
+# Your rule content
+
+Only use shadcn
