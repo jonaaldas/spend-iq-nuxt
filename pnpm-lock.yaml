@@ -15,7 +15,7 @@ importers:
         specifier: ^1.1.20
         version: 1.2.1(vue@3.5.13(typescript@5.8.2))(zod@3.24.2)
       '@clerk/nuxt':
-        specifier: ^1.3.0
+        specifier: ^1.4.3
         version: 1.4.3(magicast@0.3.5)(react@19.0.0)(vue@3.5.13(typescript@5.8.2))
       '@clerk/themes':
         specifier: ^2.2.20
@@ -92,9 +92,6 @@ importers:
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.2)
-      vue-plaid-link:
-        specifier: ^0.6.1
-        version: 0.6.1(vue@3.5.13(typescript@5.8.2))
       vue-router:
         specifier: ^4.5.0
         version: 4.5.0(vue@3.5.13(typescript@5.8.2))
@@ -3292,7 +3289,6 @@ packages:
 
   libsql@0.4.7:
     resolution: {integrity: sha512-T9eIRCs6b0J1SHKYIvD8+KCJMcWZ900iZyxdnSCdqxN12Z1ijzT+jY5nrk72Jw4B0HGzms2NgpryArlJqvc3Lw==}
-    cpu: [x64, arm64, wasm32]
     os: [darwin, linux, win32]
 
   lilconfig@3.1.3:
@@ -4850,11 +4846,6 @@ packages:
 
   vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
-
-  vue-plaid-link@0.6.1:
-    resolution: {integrity: sha512-S3qeOHplX6PiDnwC48xFuzbIEMffV8GXO1IxdnwFMjCMPhF7jdWp6ssTbcP3mX4S5FkGKnyw9Lonc70ZbId0ww==}
-    peerDependencies:
-      vue: ^2.5.9
 
   vue-router@4.5.0:
     resolution: {integrity: sha512-HDuk+PuH5monfNuY+ct49mNmkCRK4xJAV9Ts4z9UFc4rzdDnxQLyCMGGc8pKhZhHTVzfanpNwB/lwqevcBwI4w==}
@@ -10129,10 +10120,6 @@ snapshots:
       vue: 3.5.13(typescript@5.8.2)
 
   vue-devtools-stub@0.1.0: {}
-
-  vue-plaid-link@0.6.1(vue@3.5.13(typescript@5.8.2)):
-    dependencies:
-      vue: 3.5.13(typescript@5.8.2)
 
   vue-router@4.5.0(vue@3.5.13(typescript@5.8.2)):
     dependencies:

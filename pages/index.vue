@@ -39,7 +39,7 @@
             </div>
           </div>
 
-          <Waitlist />
+          <!-- <Waitlist /> -->
         </div>
       </main>
 
