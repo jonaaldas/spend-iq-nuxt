@@ -1,102 +1,113 @@
 import { CountryCode } from 'plaid'
-import { client } from '~/server/lib/plaid'
+import { client } from '~/server/utils/plaid'
 import { db } from '~/server/database/turso'
 import { plaidItems } from '~/server/database/schema'
-import { clearTransactionsCache } from '~/server/components/transactions'
+import * as z from 'zod'
+import type { AxiosResponse } from 'axios'
+import type { ItemGetResponse, AccountsGetResponse } from 'plaid'
+
+const schema = z.object({
+  public_token: z.string(),
+})
 
 export default defineEventHandler(async event => {
-  try {
-    const { userId } = event.context.auth
-    if (!userId) {
-      return createError({
-        statusCode: 401,
-        statusMessage: 'Unauthorized',
-      })
+  let userId = '1'
+  const { public_token } = await readValidatedBody(event, schema.parse)
+
+  const { data: tokenResponse, error } = await tryCatch(
+    client.itemPublicTokenExchange({ public_token })
+  )
+
+  if (error) {
+    console.log('Token Response Error', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'An unexpected error occurred',
     }
+  }
 
-    const { public_token } = await readBody(event)
+  const ACCESS_TOKEN = tokenResponse.data.access_token
+  const ITEM_ID = tokenResponse.data.item_id
 
-    // Set a timeout for the entire operation
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000) // 15-second timeout
+  const itemResponse = await client.itemGet({
+    access_token: ACCESS_TOKEN,
+  })
 
-    try {
-      const tokenResponse = await client.itemPublicTokenExchange({
-        public_token,
-      })
+  const accountsResponse = await client.accountsGet({
+    access_token: ACCESS_TOKEN,
+  })
 
-      const ACCESS_TOKEN = tokenResponse.data.access_token
-      const ITEM_ID = tokenResponse.data.item_id
-
-      // We can run these in parallel to optimize response time
-      const [itemResponse, accountsResponse] = await Promise.all([
-        client.itemGet({
-          access_token: ACCESS_TOKEN,
-        }),
-        client.accountsGet({
-          access_token: ACCESS_TOKEN,
-        }),
-      ])
-
-      const institutionId = itemResponse.data.item.institution_id || ''
-
-      // Only fetch institution details if we have an ID
-      let institutionName = 'Connected Account' // Default fallback name
-
-      if (institutionId) {
-        try {
-          const institutionResponse = await client.institutionsGetById({
-            institution_id: institutionId,
-            country_codes: ['US'] as CountryCode[],
-          })
-
-          institutionName = institutionResponse.data.institution.name
-        } catch (instError) {
-          console.error('Error fetching institution details, using default name:', instError)
-        }
-      }
-
-      const timestamp = new Date().toISOString()
-
-      // Save to database
-      await db.insert(plaidItems).values({
-        userId,
-        itemId: ITEM_ID,
-        accessToken: ACCESS_TOKEN,
-        institutionId,
-        institutionName,
-        dateConnected: timestamp,
-        accounts: JSON.stringify(accountsResponse.data.accounts),
-      })
-
-      // Clear the Redis cache for this user's transactions
-      // Don't await this to avoid blocking the response
-      clearTransactionsCache(userId).catch(error =>
-        console.error('Failed to clear cache, but proceeding anyway:', error)
-      )
-
-      return {
-        success: true,
-        institution_name: institutionName,
-        accounts: accountsResponse.data.accounts.length,
-      }
-    } finally {
-      clearTimeout(timeoutId)
+  const { data: itemsResponse, error: itemsError } = await tryCatch(Promise.resolve(itemResponse))
+  if (itemsError) {
+    console.log('Items Response Error', itemsError)
+    return {
+      success: false,
+      error: itemsError instanceof Error ? itemsError.message : 'An unexpected error occurred',
     }
-  } catch (error) {
-    console.error('Error exchanging public token:', error)
+  }
 
-    if (error instanceof Error && error.name === 'AbortError') {
-      return createError({
-        statusCode: 504,
-        statusMessage: 'Gateway Timeout',
-        message: 'The request took too long to complete. Please try again.',
-      })
+  const { data: accountResponse, error: accountError } = await tryCatch(
+    Promise.resolve(accountsResponse)
+  )
+
+  if (accountError) {
+    console.log('Accounts Response Error', accountError)
+    return {
+      success: false,
+      error: accountError instanceof Error ? accountError.message : 'An unexpected error occurred',
     }
+  }
 
-    return createError({
-      statusCode: 500,
-      statusMessage: 'Failed to exchange public token',
+  const institutionId = itemsResponse.data.item.institution_id || ''
+  let institutionName = 'Connected Account'
+
+  if (!institutionId) {
+    return {
+      success: false,
+      error: 'No institution ID found',
+    }
+  }
+
+  const { data: institutionResponse, error: institutionError } = await tryCatch(
+    client.institutionsGetById({
+      institution_id: institutionId,
+      country_codes: ['US', 'ES'] as CountryCode[],
     })
+  )
+  if (institutionError) {
+    return {
+      success: false,
+      error:
+        institutionError instanceof Error
+          ? institutionError.message
+          : 'An unexpected error occurred',
+    }
+  }
+  institutionName = institutionResponse.data.institution.name
+
+  const timestamp = new Date().toISOString()
+  const { data: insertResponse, error: insertError } = await tryCatch(
+    db.insert(plaidItems).values({
+      userId,
+      itemId: ITEM_ID,
+      accessToken: ACCESS_TOKEN,
+      institutionId,
+      institutionName,
+      dateConnected: timestamp,
+      accounts: JSON.stringify(accountResponse.data.accounts),
+    })
+  )
+  if (insertError) {
+    return {
+      success: false,
+      error: insertError instanceof Error ? insertError.message : 'An unexpected error occurred',
+    }
+  }
+  // Clear the Redis cache for this user's transactions
+
+  return {
+    success: true,
+    institution_name: institutionName,
+    accounts: accountResponse.data.accounts.length,
   }
 })
