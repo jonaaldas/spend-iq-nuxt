@@ -6,7 +6,7 @@ import { plaidItems } from '~/server/database/schema'
 import type { PlaidItem } from '~/server/database/schema'
 import { tryCatch } from '~/server/utils/tryCatch'
 import type { AxiosResponse } from 'axios'
-
+import type { H3Event } from 'h3'
 // Simplified Institution type that matches our needs
 interface SimpleInstitution {
   name: string
@@ -37,7 +37,9 @@ interface ErrorResponse {
   success: false
 }
 
-async function getPlaidData(userId: string): Promise<PlaidTransactionsResponse | ErrorResponse> {
+async function getPlaidDataUncached(
+  userId: string
+): Promise<PlaidTransactionsResponse | ErrorResponse> {
   if (!userId) {
     return { success: false }
   }
@@ -157,10 +159,28 @@ async function getPlaidData(userId: string): Promise<PlaidTransactionsResponse |
   }
 }
 
+const getPlaidData = defineCachedFunction(
+  async (event: H3Event, userId: string) => {
+    return getPlaidDataUncached(userId)
+  },
+  {
+    getKey: event => {
+      return getCachePrefix('1')
+    },
+    base: 'redis',
+    swr: false,
+    maxAge: 60,
+  }
+)
+
 function getCachePrefix(userId: string): string {
   return `plaid:${userId}`
 }
 
-function clearCache(userId: string): void {}
+async function clearCache(userId: string): Promise<void> {
+  const cachePrefix = getCachePrefix(userId)
+  const storage = useStorage('redis')
+  await storage.removeItem(`nitro:functions:_:${cachePrefix}.json`)
+}
 
-export { getPlaidData }
+export { getPlaidData, getCachePrefix, clearCache }

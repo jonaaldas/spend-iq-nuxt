@@ -79,7 +79,7 @@ const data = {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-    <main>
+    <main class="flex flex-col h-screen p-12 w-full">
       <slot></slot>
     </main>
   </SidebarProvider>

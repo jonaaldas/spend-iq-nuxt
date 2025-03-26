@@ -10,4 +10,24 @@ export default defineNuxtConfig({
   tailwindcss: {
     cssPath: './assets/css/global.css',
   },
+  runtimeConfig: {
+    redis: {
+      driver: 'redis',
+      host: 'adjusted-gazelle-57064.upstash.io',
+      password: 'Ad7oAAIncDFmMmNiZWQ3OGJjMzY0MTMxOWRiNzc4ODdkMzc1MTg2M3AxNTcwNjQ',
+      port: 6379,
+    },
+  },
+  nitro: {
+    storage: {
+      redis: {
+        driver: 'redis',
+        host: 'adjusted-gazelle-57064.upstash.io',
+        password: 'Ad7oAAIncDFmMmNiZWQ3OGJjMzY0MTMxOWRiNzc4ODdkMzc1MTg2M3AxNTcwNjQ',
+        port: 6379,
+        db: 0,
+        tls: {},
+      },
+    },
+  },
 })
