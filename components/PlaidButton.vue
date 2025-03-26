@@ -82,6 +82,7 @@ const handleClick = async () => {
     },
     onExit: (error: any, metadata: any) => {
       console.log('Exit')
+      isLoading.value = false
     },
   }
 
