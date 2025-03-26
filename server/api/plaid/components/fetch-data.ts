@@ -169,7 +169,7 @@ const getPlaidData = defineCachedFunction(
     },
     base: 'redis',
     swr: false,
-    maxAge: 60,
+    maxAge: 60 * 60, //1h
   }
 )
 
