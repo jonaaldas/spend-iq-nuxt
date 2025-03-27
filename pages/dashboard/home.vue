@@ -34,14 +34,14 @@
           <div>{{ formatCurrency(item.total) }}</div>
         </div>
         <div class="flex flex-row justify-between gap-6">
-          <div>Total</div>
+          <div>Total Balance</div>
           <div class="font-bold" :class="[total > 0 ? 'text-green-500' : 'text-red-500']">
             {{ formatCurrency(total) }}
           </div>
         </div>
       </div>
     </div>
-    <DataTable :columns="columns" :data="data" />
+    <DataTable :columns="columns" :data="data.transactions" />
   </div>
 </template>
 
@@ -53,13 +53,14 @@ import DataTable from '~/components/DataTable.vue'
 import { Button } from '~/components/ui/button'
 import { RefreshCcw } from 'lucide-vue-next'
 import { DonutChart } from '~/components/ui/chart-donut'
-const data = ref<Payment[]>([])
+const data = ref<{ transactions: Payment[]; accounts: any[] }>({ transactions: [], accounts: [] })
 
 async function getData(): Promise<Payment[]> {
-  const { data } = await $fetch<{ success: boolean; data: { transactions: Payment[] } }>(
-    '/api/plaid/data'
-  )
-  return data.transactions || []
+  const { data } = await $fetch<{
+    success: boolean
+    data: { transactions: Payment[]; accounts: any[] }
+  }>('/api/plaid/data')
+  return data || []
 }
 
 async function refresh() {
@@ -74,11 +75,11 @@ const formatCurrency = (amount: number) => {
 }
 
 const categoryData = computed(() => {
-  if (!data.value?.length) return []
+  if (!data.value?.transactions?.length) return []
 
   const categoryMap = new Map<string, number>()
 
-  data.value.forEach(transaction => {
+  data.value.transactions.forEach(transaction => {
     if (transaction.personal_finance_category?.primary) {
       const category = transaction.personal_finance_category.primary
       const amount = Math.abs(transaction.amount)
@@ -100,7 +101,7 @@ const categoryData = computed(() => {
 })
 
 const total = computed(() => {
-  return data.value.reduce((acc, curr) => acc + curr.amount, 0)
+  return data.value.accounts.reduce((acc, curr) => acc + curr.balances.available, 0)
 })
 
 onMounted(async () => {
