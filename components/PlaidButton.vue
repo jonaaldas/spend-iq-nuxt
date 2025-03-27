@@ -29,7 +29,10 @@ import { LucidePlus } from 'lucide-vue-next'
 import { Toaster } from './ui/toast'
 import { cn } from '@/lib/utils'
 import type { HTMLAttributes } from 'vue'
-// Add type for window.Plaid
+import { useFinanceStore } from '~/store/finance-store'
+const financeStore = useFinanceStore()
+const { getData } = financeStore
+
 declare global {
   interface Window {
     Plaid: {
@@ -78,7 +81,13 @@ const handleClick = async () => {
         method: 'POST',
         body: { public_token },
       })
+      if (!res.success) {
+        console.error('Failed to set access token')
+        isLoading.value = false
+        return
+      }
       isLoading.value = false
+      await getData()
     },
     onExit: (error: any, metadata: any) => {
       console.log('Exit')
@@ -88,20 +97,6 @@ const handleClick = async () => {
 
   const handler = window.Plaid.create(config)
   handler.open()
-}
-
-const transactions = ref({})
-
-const getPlaidTransactions = async () => {
-  const response = await $fetch<{
-    success: boolean
-    data: { transactions: any[]; accounts: any[]; institutions: any[] }
-  }>('/api/plaid/data')
-  if (!response.success) {
-    console.error('Failed to get transactions')
-    return
-  }
-  transactions.value = response.data
 }
 </script>
 

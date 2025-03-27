@@ -3,8 +3,7 @@ import { client } from '~/server/utils/plaid'
 import { db } from '~/server/database/turso'
 import { plaidItems } from '~/server/database/schema'
 import * as z from 'zod'
-import type { AxiosResponse } from 'axios'
-import type { ItemGetResponse, AccountsGetResponse } from 'plaid'
+import { clearCache } from './components/fetch-data'
 
 const schema = z.object({
   public_token: z.string(),
@@ -104,6 +103,7 @@ export default defineEventHandler(async event => {
     }
   }
   // Clear the Redis cache for this user's transactions
+  await clearCache(userId)
 
   return {
     success: true,

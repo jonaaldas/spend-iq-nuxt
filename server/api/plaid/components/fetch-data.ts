@@ -47,6 +47,7 @@ async function getPlaidDataUncached(
   const { data: usersAccessTokens, error } = await tryCatch<PlaidItem[]>(
     db.select().from(plaidItems).where(eq(plaidItems.userId, userId))
   )
+  console.log('🚀 ~ usersAccessTokens:', usersAccessTokens)
 
   if (error || !usersAccessTokens || usersAccessTokens.length === 0) {
     return { success: false }
@@ -60,7 +61,7 @@ async function getPlaidDataUncached(
   const allAccounts: (AccountBase & { institution: SimpleInstitution; item_id: string })[] = []
   const institutions: Record<string, SimpleInstitution> = {}
 
-  const maxItemsToProcess = Math.min(usersAccessTokens.length, 3)
+  const maxItemsToProcess = Math.min(usersAccessTokens.length, usersAccessTokens.length)
 
   type ItemResult = ProcessedPlaidItem | ErrorResponse
   const { data: processedItems, error: processedItemsError } = await tryCatch<ItemResult[]>(
@@ -90,7 +91,14 @@ async function getPlaidDataUncached(
 
           const { added, has_more, next_cursor } = transactionsResponse
 
-          itemTransactions = [...itemTransactions, ...added]
+          // add the institution name to the transactions
+          const institutionName = item.institutionName
+          const transactionsWithInstitution = added.map(transaction => ({
+            ...transaction,
+            institution_name: institutionName,
+          }))
+
+          itemTransactions = [...itemTransactions, ...transactionsWithInstitution]
           hasMore = has_more
           cursor = next_cursor
           fetchAttempts++

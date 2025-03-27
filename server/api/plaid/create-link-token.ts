@@ -12,6 +12,7 @@ export default defineEventHandler(async event => {
   const { data: response, error } = await tryCatch(client.linkTokenCreate(request))
 
   if (error) {
+    console.log('🚀 ~ error:', error)
     return {
       success: false,
       error: error instanceof Error ? error.message : 'An unexpected error occurred',

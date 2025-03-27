@@ -1,6 +1,7 @@
 import { h } from 'vue'
 import type { VNode, VNodeArrayChildren } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
+import { createColumnHelper } from '@tanstack/vue-table'
 import { ArrowUpDown, ChevronDown } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 interface Location {
@@ -52,6 +53,8 @@ export interface Payment {
   transaction_type: string
   unofficial_currency_code: string
   website: string
+  institution_name: string
+  account_name: string
 }
 
 export const payments: Payment[] = [
@@ -87,8 +90,12 @@ export const payments: Payment[] = [
     transaction_type: 'Credit',
     unofficial_currency_code: '',
     website: 'https://www.starbucks.com',
+    institution_name: 'Bank of America',
+    account_name: 'Checking',
   },
 ]
+
+const columnHelper = createColumnHelper<Payment>()
 
 export const columns: ColumnDef<Payment>[] = [
   {
@@ -312,6 +319,23 @@ export const columns: ColumnDef<Payment>[] = [
       )
 
       return h('div', { class: 'flex flex-wrap gap-1' }, elements)
+    },
+  },
+  {
+    accessorKey: 'institution_name',
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: 'ghost',
+          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+        },
+        () => ['Institution', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
+      )
+    },
+    cell: ({ row }) => {
+      const institutionName = row.getValue('institution_name') as string
+      return h('div', { class: 'text-xs text-muted-foreground' }, [institutionName])
     },
   },
 ]
