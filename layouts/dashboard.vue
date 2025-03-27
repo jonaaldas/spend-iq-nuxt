@@ -29,11 +29,11 @@ const data = {
       url: '/dashboard/home',
       items: [],
     },
-    {
-      title: 'Transactions',
-      url: '/dashboard/transactions',
-      items: [],
-    },
+    // {
+    //   title: 'Transactions',
+    //   url: '/dashboard/transactions',
+    //   items: [],
+    // },
     {
       title: 'Accounts',
       url: '/dashboard/accounts',
