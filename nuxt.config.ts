@@ -17,6 +17,7 @@ export default defineNuxtConfig({
       password: 'Ad7oAAIncDFmMmNiZWQ3OGJjMzY0MTMxOWRiNzc4ODdkMzc1MTg2M3AxNTcwNjQ',
       port: 6379,
     },
+    openaiApiKey: process.env.NUXT_OPENAI_API_KEY,
   },
   nitro: {
     storage: {

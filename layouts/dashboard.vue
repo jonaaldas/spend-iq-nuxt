@@ -61,8 +61,11 @@ onMounted(async () => {
                   <GalleryVerticalEnd class="size-4" />
                 </div>
                 <div class="flex flex-col gap-0.5 leading-none">
-                  <span class="font-semibold">Documentation</span>
-                  <span class="">v1.0.0</span>
+                  <span
+                    class="font-semibold bg-gradient-to-r from-pink-500 via-purple-500 to-blue-600 bg-clip-text text-transparent"
+                    >SPEND IQ</span
+                  >
+                  <span class="text-xs text-muted-foreground">DEMO</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -94,4 +97,5 @@ onMounted(async () => {
       <slot></slot>
     </main>
   </SidebarProvider>
+  <ChatBot />
 </template>
