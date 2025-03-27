@@ -8,8 +8,9 @@
         </div>
       </div>
       <div class="flex gap-2">
-        <Button variant="outline" @click="refresh">
-          <RefreshCcw class="w-4 h-4" />
+        <Button variant="outline" @click="refresh" :disabled="loading">
+          <RefreshCcw v-if="!loading" class="w-4 h-4" />
+          <Loader2 v-else class="w-4 h-4 animate-spin" />
           Refresh
         </Button>
         <PlaidButton />
@@ -51,20 +52,62 @@ import { onMounted, ref } from 'vue'
 import { columns } from '~/components/table/column'
 import DataTable from '~/components/DataTable.vue'
 import { Button } from '~/components/ui/button'
-import { RefreshCcw } from 'lucide-vue-next'
+import { RefreshCcw, Loader2 } from 'lucide-vue-next'
 import { DonutChart } from '~/components/ui/chart-donut'
-const data = ref<{ transactions: Payment[]; accounts: any[] }>({ transactions: [], accounts: [] })
-
-async function getData(): Promise<Payment[]> {
-  const { data } = await $fetch<{
+const data = ref<
+  | {
+      transactions: Payment[]
+      accounts: any[]
+      institutions: any[]
+    }
+  | {
+      success: boolean
+      data: {
+        transactions: Payment[]
+        accounts: any[]
+        institutions: any[]
+      }
+    }
+>({ transactions: [], accounts: [], institutions: [] })
+const loading = ref(false)
+async function getData(): Promise<
+  | {
+      transactions: Payment[]
+      accounts: any[]
+      institutions: any[]
+    }
+  | {
+      success: boolean
+      data: {
+        transactions: Payment[]
+        accounts: any[]
+        institutions: any[]
+      }
+    }
+> {
+  const { success, data } = await $fetch<{
     success: boolean
-    data: { transactions: Payment[]; accounts: any[] }
+    data: {
+      transactions: Payment[]
+      accounts: any[]
+      institutions: any[]
+    }
   }>('/api/plaid/data')
-  return data || []
+  if (!success) {
+    return { success: false, data: { transactions: [], accounts: [], institutions: [] } }
+  }
+  return data
 }
 
 async function refresh() {
-  return true
+  loading.value = true
+  const { success } = await $fetch<{ success: boolean }>('/api/plaid/refresh', {
+    method: 'POST',
+  })
+  if (success) {
+    data.value = await getData()
+  }
+  loading.value = false
 }
 
 const formatCurrency = (amount: number) => {
@@ -101,6 +144,7 @@ const categoryData = computed(() => {
 })
 
 const total = computed(() => {
+  if (!data.value.accounts?.length) return 0
   return data.value.accounts.reduce((acc, curr) => acc + curr.balances.available, 0)
 })
 

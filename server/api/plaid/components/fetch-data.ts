@@ -23,7 +23,7 @@ interface ProcessedPlaidItem {
   institutions: Record<string, SimpleInstitution>
 }
 
-interface PlaidTransactionsResponse {
+export interface PlaidTransactionsResponse {
   success: true
   transactions: Transaction[]
   accounts: (AccountBase & {
@@ -33,7 +33,7 @@ interface PlaidTransactionsResponse {
   institutions: Record<string, SimpleInstitution>
 }
 
-interface ErrorResponse {
+export interface ErrorResponse {
   success: false
 }
 

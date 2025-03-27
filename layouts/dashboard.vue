@@ -28,8 +28,13 @@ const data = {
       items: [],
     },
     {
-      title: 'Expenses',
-      url: '/dashboard/expenses',
+      title: 'Transactions',
+      url: '/dashboard/transactions',
+      items: [],
+    },
+    {
+      title: 'Accounts',
+      url: '/dashboard/accounts',
       items: [],
     },
   ],
