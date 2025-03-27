@@ -54,103 +54,10 @@ import DataTable from '~/components/DataTable.vue'
 import { Button } from '~/components/ui/button'
 import { RefreshCcw, Loader2 } from 'lucide-vue-next'
 import { DonutChart } from '~/components/ui/chart-donut'
-const data = ref<
-  | {
-      transactions: Payment[]
-      accounts: any[]
-      institutions: any[]
-    }
-  | {
-      success: boolean
-      data: {
-        transactions: Payment[]
-        accounts: any[]
-        institutions: any[]
-      }
-    }
->({ transactions: [], accounts: [], institutions: [] })
-const loading = ref(false)
-async function getData(): Promise<
-  | {
-      transactions: Payment[]
-      accounts: any[]
-      institutions: any[]
-    }
-  | {
-      success: boolean
-      data: {
-        transactions: Payment[]
-        accounts: any[]
-        institutions: any[]
-      }
-    }
-> {
-  const { success, data } = await $fetch<{
-    success: boolean
-    data: {
-      transactions: Payment[]
-      accounts: any[]
-      institutions: any[]
-    }
-  }>('/api/plaid/data')
-  if (!success) {
-    return { success: false, data: { transactions: [], accounts: [], institutions: [] } }
-  }
-  return data
-}
-
-async function refresh() {
-  loading.value = true
-  const { success } = await $fetch<{ success: boolean }>('/api/plaid/refresh', {
-    method: 'POST',
-  })
-  if (success) {
-    data.value = await getData()
-  }
-  loading.value = false
-}
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount)
-}
-
-const categoryData = computed(() => {
-  if (!data.value?.transactions?.length) return []
-
-  const categoryMap = new Map<string, number>()
-
-  data.value.transactions.forEach(transaction => {
-    if (transaction.personal_finance_category?.primary) {
-      const category = transaction.personal_finance_category.primary
-      const amount = Math.abs(transaction.amount)
-
-      if (categoryMap.has(category)) {
-        categoryMap.set(category, categoryMap.get(category)! + amount)
-      } else {
-        categoryMap.set(category, amount)
-      }
-    }
-  })
-
-  const result = Array.from(categoryMap.entries())
-    .map(([name, value]) => ({ name, total: Number(value) }))
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 8)
-
-  return result
-})
-
-const total = computed(() => {
-  if (!data.value.accounts?.length) return 0
-  return data.value.accounts.reduce((acc, curr) => acc + curr.balances.available, 0)
-})
-
-onMounted(async () => {
-  data.value = await getData()
-})
+import { useFinanceStore } from '~/store/finance-store'
+const financeStore = useFinanceStore()
+const { refresh, formatCurrency } = financeStore
+const { data, loading, categoryData, total } = storeToRefs(financeStore)
 
 definePageMeta({
   layout: 'dashboard',

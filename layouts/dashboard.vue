@@ -12,6 +12,8 @@ import {
   SidebarMenuSubItem,
   type SidebarProps,
 } from '@/components/ui/sidebar'
+import { useFinanceStore } from '~/store/finance-store'
+const financeStore = useFinanceStore()
 
 import { GalleryVerticalEnd } from 'lucide-vue-next'
 
@@ -39,6 +41,10 @@ const data = {
     },
   ],
 }
+
+onMounted(async () => {
+  await financeStore.getData()
+})
 </script>
 
 <template>
