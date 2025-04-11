@@ -47,8 +47,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Payment } from '~/components/table/column'
-import { onMounted, ref } from 'vue'
 import { columns } from '~/components/table/column'
 import DataTable from '~/components/DataTable.vue'
 import { Button } from '~/components/ui/button'

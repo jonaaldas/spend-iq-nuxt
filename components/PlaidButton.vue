@@ -26,7 +26,6 @@
 <script setup lang="ts">
 import { Button } from '~/components/ui/button'
 import { LucidePlus } from 'lucide-vue-next'
-import { Toaster } from './ui/toast'
 import { cn } from '@/lib/utils'
 import type { HTMLAttributes } from 'vue'
 import { useFinanceStore } from '~/store/finance-store'

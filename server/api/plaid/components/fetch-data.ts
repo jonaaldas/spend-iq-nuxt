@@ -47,7 +47,6 @@ async function getPlaidDataUncached(
   const { data: usersAccessTokens, error } = await tryCatch<PlaidItem[]>(
     db.select().from(plaidItems).where(eq(plaidItems.userId, userId))
   )
-  console.log('🚀 ~ usersAccessTokens:', usersAccessTokens)
 
   if (error || !usersAccessTokens || usersAccessTokens.length === 0) {
     return { success: false }
