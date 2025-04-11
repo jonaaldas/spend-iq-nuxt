@@ -57,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useFinanceStore } from '~/store/finance-store'
 import { Button } from '~/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~/components/ui/card'
