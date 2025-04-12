@@ -1,3 +1,9 @@
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
@@ -33,5 +39,20 @@ export default defineNuxtConfig({
   },
   build: {
     transpile: ['vue'],
+  },
+  vite: {
+    server: {
+      fs: {
+        // Allow Vite to access files outside the project root
+        allow: [
+          // Allow access to the node_modules directory
+          '/Users/jona/node_modules',
+          // Allow access to the parent directory (which may contain node_modules)
+          '..',
+          // For absolute certainty, allow the entire user directory
+          '/Users/jona',
+        ],
+      },
+    },
   },
 })
