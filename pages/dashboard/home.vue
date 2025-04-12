@@ -9,8 +9,8 @@
       </div>
       <div class="flex gap-2">
         <Button variant="outline" @click="refresh" :disabled="loading">
-          <RefreshCcw v-if="!loading" class="w-4 h-4" />
-          <Loader2 v-else class="w-4 h-4 animate-spin" />
+          <!-- <RefreshCcw v-if="!loading" class="w-4 h-4" />
+          <Loader2 v-else class="w-4 h-4 animate-spin" /> -->
           Refresh
         </Button>
         <PlaidButton />
@@ -50,7 +50,7 @@
 import { columns } from '~/components/table/column'
 import DataTable from '~/components/DataTable.vue'
 import { Button } from '~/components/ui/button'
-import { RefreshCcw, Loader2 } from 'lucide-vue-next'
+// import { RefreshCcw, Loader2 } from 'lucide-vue-next'
 import { DonutChart } from '~/components/ui/chart-donut'
 import { useFinanceStore } from '~/store/finance-store'
 const financeStore = useFinanceStore()

@@ -3,8 +3,8 @@
     <div class="flex justify-between items-center">
       <h1 class="text-2xl font-bold">Accounts</h1>
       <Button @click="refresh" :disabled="loading">
-        <RefreshCcw v-if="!loading" class="w-4 h-4 mr-2" />
-        <Loader2 v-else class="w-4 h-4 mr-2 animate-spin" />
+        <!-- <RefreshCcw v-if="!loading" class="w-4 h-4 mr-2" />
+        <Loader2 v-else class="w-4 h-4 mr-2 animate-spin" /> -->
         Refresh
       </Button>
     </div>
@@ -23,11 +23,11 @@
               <DropdownMenuTrigger
                 class="absolute right-4 top-4 hover:bg-accent hover:text-accent-foreground h-8 w-8 inline-flex items-center justify-center rounded-md"
               >
-                <MoreHorizontal class="w-4 h-4" />
+                <!-- <MoreHorizontal class="w-4 h-4" /> -->
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem @click="handleDelete(account.id)" class="text-destructive">
-                  <Trash class="w-4 h-4 mr-2" />
+                  <!-- <Trash class="w-4 h-4 mr-2" /> -->
                   Delete Account
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -66,7 +66,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '~/components/ui/dropdown-menu'
-import { RefreshCcw, Loader2, MoreHorizontal, Trash } from 'lucide-vue-next'
+// import { RefreshCcw, Loader2, MoreHorizontal, Trash } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'dashboard',
