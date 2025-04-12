@@ -54,8 +54,5 @@ export default defineNuxtConfig({
         ],
       },
     },
-    resolve: {
-      dedupe: ['vue'],
-    },
   },
 })
