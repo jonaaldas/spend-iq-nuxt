@@ -39,7 +39,7 @@
             </div>
           </div>
 
-          <Waitlist />
+          <!-- Here we will add a customer waitlist form -->
         </div>
       </main>
 

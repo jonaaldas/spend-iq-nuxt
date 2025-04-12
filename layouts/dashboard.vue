@@ -12,6 +12,8 @@ import {
   SidebarMenuSubItem,
   type SidebarProps,
 } from '@/components/ui/sidebar'
+import { useFinanceStore } from '~/store/finance-store'
+const financeStore = useFinanceStore()
 
 import { GalleryVerticalEnd } from 'lucide-vue-next'
 
@@ -27,13 +29,22 @@ const data = {
       url: '/dashboard/home',
       items: [],
     },
+    // {
+    //   title: 'Transactions',
+    //   url: '/dashboard/transactions',
+    //   items: [],
+    // },
     {
-      title: 'Expenses',
-      url: '/dashboard/expenses',
+      title: 'Accounts',
+      url: '/dashboard/accounts',
       items: [],
     },
   ],
 }
+
+onMounted(async () => {
+  await financeStore.getData()
+})
 </script>
 
 <template>
@@ -50,8 +61,11 @@ const data = {
                   <GalleryVerticalEnd class="size-4" />
                 </div>
                 <div class="flex flex-col gap-0.5 leading-none">
-                  <span class="font-semibold">Documentation</span>
-                  <span class="">v1.0.0</span>
+                  <span
+                    class="font-semibold bg-gradient-to-r from-pink-500 via-purple-500 to-blue-600 bg-clip-text text-transparent"
+                    >SPEND IQ</span
+                  >
+                  <span class="text-xs text-muted-foreground">DEMO</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -79,8 +93,9 @@ const data = {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-    <main>
+    <main class="flex flex-col h-screen p-12 w-full">
       <slot></slot>
     </main>
   </SidebarProvider>
+  <ChatBot />
 </template>
