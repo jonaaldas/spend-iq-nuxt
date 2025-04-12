@@ -43,15 +43,7 @@ export default defineNuxtConfig({
   vite: {
     server: {
       fs: {
-        // Allow Vite to access files outside the project root
-        allow: [
-          // Allow access to the node_modules directory
-          '/Users/jona/node_modules',
-          // Allow access to the parent directory (which may contain node_modules)
-          '..',
-          // For absolute certainty, allow the entire user directory
-          '/Users/jona',
-        ],
+        allow: ['/Users/jona/node_modules', '..', '/Users/jona'],
       },
     },
   },
