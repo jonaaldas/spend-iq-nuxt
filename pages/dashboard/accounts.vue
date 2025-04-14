@@ -10,7 +10,7 @@
     </div>
 
     <div v-if="loading" class="flex justify-center items-center min-h-[200px]">
-      <Loader2 class="w-8 h-8 animate-spin" />
+      <!-- <Loader2 class="w-8 h-8 animate-spin" /> -->
     </div>
 
     <div v-else class="grid gap-6">
