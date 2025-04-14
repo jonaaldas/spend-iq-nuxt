@@ -1,10 +1,9 @@
 import { CountryCode } from 'plaid'
 import { client } from '~/server/utils/plaid'
-import { db } from '~/server/database/turso'
 import { plaidItems } from '~/server/database/schema'
 import * as z from 'zod'
 import { clearCache } from './components/fetch-data'
-
+import { db } from '~/server/database/turso'
 const schema = z.object({
   public_token: z.string(),
 })

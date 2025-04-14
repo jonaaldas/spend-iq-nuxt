@@ -7,8 +7,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
+} from '~~/components/ui/table'
+import { Input } from '~~/components/ui/input'
 import { valueUpdater } from '../lib/utils'
 import {
   FlexRender,

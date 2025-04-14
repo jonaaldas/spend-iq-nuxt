@@ -1,12 +1,11 @@
 import { Transaction, AccountBase, TransactionsSyncResponse, AccountsGetResponse } from 'plaid'
 import { format, subMonths } from 'date-fns'
 import { eq } from 'drizzle-orm'
-import { db } from '~/server/database/turso'
 import { plaidItems } from '~/server/database/schema'
 import type { PlaidItem } from '~/server/database/schema'
 import { tryCatch } from '~/server/utils/tryCatch'
-import type { AxiosResponse } from 'axios'
 import type { H3Event } from 'h3'
+import { db } from '~/server/database/turso'
 // Simplified Institution type that matches our needs
 interface SimpleInstitution {
   name: string

@@ -11,12 +11,12 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   type SidebarProps,
-} from '@/components/ui/sidebar'
+} from '~~/components/ui/sidebar'
+import { authClient } from '../lib/auth-client'
 import { useFinanceStore } from '~/store/finance-store'
-const financeStore = useFinanceStore()
-
 import { GalleryVerticalEnd } from 'lucide-vue-next'
 
+const financeStore = useFinanceStore()
 const props = withDefaults(defineProps<SidebarProps>(), {
   variant: 'floating',
 })
@@ -40,6 +40,19 @@ const data = {
       items: [],
     },
   ],
+}
+
+const logout = async () => {
+  await authClient.signOut({
+    fetchOptions: {
+      onSuccess: () => {
+        navigateTo('/login')
+      },
+      onError: () => {
+        console.error('Error signing out')
+      },
+    },
+  })
 }
 
 onMounted(async () => {
@@ -88,6 +101,11 @@ onMounted(async () => {
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
               </SidebarMenuSub>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton as-child>
+                <NuxtLink href="#" @click="logout">Logout</NuxtLink>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
