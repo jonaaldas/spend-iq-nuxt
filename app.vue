@@ -1,5 +1,6 @@
 <template>
   <Toaster />
+  <NuxtLoadingIndicator />
   <NuxtLayout>
     <NuxtPage />
     <Toaster />

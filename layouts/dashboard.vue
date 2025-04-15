@@ -39,6 +39,11 @@ const data = {
       url: '/dashboard/accounts',
       items: [],
     },
+    {
+      title: 'Settings',
+      url: '/dashboard/settings',
+      items: [],
+    },
   ],
 }
 

@@ -45,11 +45,10 @@ const handleLogin = async () => {
             <Input id="password" type="password" v-model="password" required />
           </div>
           <Button type="submit" class="w-full" @click="handleLogin"> Login </Button>
-          <Button variant="outline" class="w-full"> Login with Google </Button>
         </div>
         <div class="mt-4 text-center text-sm">
           Don't have an account?
-          <a href="#" class="underline"> Sign up </a>
+          <a href="/register" class="underline"> Register </a>
         </div>
       </CardContent>
     </Card>
