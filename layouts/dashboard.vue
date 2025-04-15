@@ -17,6 +17,8 @@ import { useFinanceStore } from '~/store/finance-store'
 import { GalleryVerticalEnd } from 'lucide-vue-next'
 
 const financeStore = useFinanceStore()
+const { data: financeData } = storeToRefs(financeStore)
+const auth = useState('auth')
 const props = withDefaults(defineProps<SidebarProps>(), {
   variant: 'floating',
 })
@@ -53,7 +55,7 @@ const logout = async () => {
   await authClient.signOut({
     fetchOptions: {
       onSuccess: () => {
-        navigateTo('/login')
+        window.location.href = '/login'
       },
       onError: () => {
         console.error('Error signing out')
@@ -63,8 +65,8 @@ const logout = async () => {
 }
 
 const checkActiveSubscription = async () => {
-  const paymentInformation = await $fetch('/api/auth/state')
-  hasActiveSubscription.value = paymentInformation.activeSubscriptions.length > 0
+  const { polarDetails } = auth.value
+  hasActiveSubscription.value = polarDetails.activeSubscriptions.length > 0
 }
 
 // [1,2,3].map
@@ -82,6 +84,10 @@ onMounted(async () => {
   await checkActiveSubscription()
   filterNavItems()
   await financeStore.getData()
+})
+
+definePageMeta({
+  middleware: ['auth'],
 })
 </script>
 
@@ -115,14 +121,14 @@ onMounted(async () => {
           <SidebarMenu class="gap-2">
             <SidebarMenuItem v-for="item in filteredNavItems" :key="item.title">
               <SidebarMenuButton as-child>
-                <a :href="item.url" class="font-medium">
+                <NuxtLink :href="item.url" class="font-medium">
                   {{ item.title }}
-                </a>
+                </NuxtLink>
               </SidebarMenuButton>
               <SidebarMenuSub v-if="item.items.length">
                 <SidebarMenuSubItem v-for="childItem in item.items" :key="childItem.title">
                   <SidebarMenuSubButton as-child :is-active="childItem.isActive">
-                    <a :href="childItem.url">{{ childItem.title }}</a>
+                    <NuxtLink :href="childItem.url">{{ childItem.title }}</NuxtLink>
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
               </SidebarMenuSub>
@@ -140,5 +146,5 @@ onMounted(async () => {
       <slot></slot>
     </main>
   </SidebarProvider>
-  <ChatBot />
+  <ChatBot v-if="financeData.transactions.length > 0" />
 </template>

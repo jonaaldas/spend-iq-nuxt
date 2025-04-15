@@ -1,10 +1,11 @@
 <template>
-  <Toaster />
-  <NuxtLoadingIndicator />
-  <NuxtLayout>
-    <NuxtPage />
+  <div>
+    <NuxtLoadingIndicator :height="7" color="black" />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
     <Toaster />
-  </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -32,7 +32,7 @@ const handleLogin = async () => {
         <CardDescription> Enter your email below to login to your account </CardDescription>
       </CardHeader>
       <CardContent>
-        <div class="grid gap-4">
+        <form class="grid gap-4" @submit.prevent="handleLogin">
           <div class="grid gap-2">
             <Label for="email">Email</Label>
             <Input id="email" type="email" v-model="email" placeholder="m@example.com" required />
@@ -44,8 +44,8 @@ const handleLogin = async () => {
             </div>
             <Input id="password" type="password" v-model="password" required />
           </div>
-          <Button type="submit" class="w-full" @click="handleLogin"> Login </Button>
-        </div>
+          <Button type="submit" class="w-full"> Login </Button>
+        </form>
         <div class="mt-4 text-center text-sm">
           Don't have an account?
           <a href="/register" class="underline"> Register </a>

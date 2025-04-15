@@ -1,8 +1,11 @@
 import { Products, CountryCode } from 'plaid'
 
 export default defineEventHandler(async event => {
+  if (!event.context.auth) {
+    return { success: false, error: 'Unauthorized' }
+  }
   const request = {
-    user: { client_user_id: '1' },
+    user: { client_user_id: event.context.auth.user.id },
     client_name: 'Personal Finance Dashboard',
     products: [Products.Transactions, Products.Investments, Products.Auth],
     country_codes: [CountryCode.Us, CountryCode.Es],
