@@ -11,7 +11,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   type SidebarProps,
-} from '~~/components/ui/sidebar'
+} from '~/components/ui/sidebar'
 import { authClient } from '../lib/auth-client'
 import { useFinanceStore } from '~/store/finance-store'
 import { GalleryVerticalEnd } from 'lucide-vue-next'
@@ -21,6 +21,8 @@ const props = withDefaults(defineProps<SidebarProps>(), {
   variant: 'floating',
 })
 
+const hasActiveSubscription = ref(false)
+const filteredNavItems = ref([])
 // This is sample data.
 const data = {
   navMain: [
@@ -60,7 +62,25 @@ const logout = async () => {
   })
 }
 
+const checkActiveSubscription = async () => {
+  const paymentInformation = await $fetch('/api/auth/state')
+  hasActiveSubscription.value = paymentInformation.activeSubscriptions.length > 0
+}
+
+// [1,2,3].map
+const filterNavItems = () => {
+  const notAllowedIfNotActive = ['Home', 'Accounts']
+  filteredNavItems.value = data.navMain.filter(item => {
+    if (hasActiveSubscription.value) {
+      return true
+    }
+    return !notAllowedIfNotActive.includes(item.title)
+  })
+}
+
 onMounted(async () => {
+  await checkActiveSubscription()
+  filterNavItems()
   await financeStore.getData()
 })
 </script>
@@ -93,7 +113,7 @@ onMounted(async () => {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu class="gap-2">
-            <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
+            <SidebarMenuItem v-for="item in filteredNavItems" :key="item.title">
               <SidebarMenuButton as-child>
                 <a :href="item.url" class="font-medium">
                   {{ item.title }}
