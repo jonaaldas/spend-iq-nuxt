@@ -1,4 +1,5 @@
 <template>
+  <a href="/api/auth/checkout?productId=af11d002-cb7a-4265-9e59-b43779f71342">Checkout</a>
   <div class="flex flex-col gap-4 container mx-auto max-w-screen-xl">
     <div class="flex justify-between">
       <div>
@@ -56,9 +57,20 @@ import { useFinanceStore } from '~/store/finance-store'
 const financeStore = useFinanceStore()
 const { refresh, formatCurrency } = financeStore
 const { data, loading, categoryData, total } = storeToRefs(financeStore)
-
+import { authClient } from '../../lib/auth-client'
 definePageMeta({
   layout: 'dashboard',
+})
+
+onMounted(async () => {
+  // const res = await authClient.api.createCheckoutSession({
+  //   params: {
+  //     slug: 'pro',
+  //   },
+  //   headers: await headers(),
+  // })
+  // console.log(res)
+  // console.log(authClient.)
 })
 </script>
 

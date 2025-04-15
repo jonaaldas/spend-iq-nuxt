@@ -3,6 +3,13 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { user, session, account, verification } from '../database/schema'
 import { tryCatch } from './tryCatch'
 import { db } from '../database/turso'
+import { polar } from '@polar-sh/better-auth'
+import { Polar } from '@polar-sh/sdk'
+
+const client = new Polar({
+  accessToken: process.env.NUXT_POLAR_ACCESS_TOKEN,
+  server: 'sandbox',
+})
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -31,4 +38,21 @@ export const auth = betterAuth({
       }
     },
   },
+  plugins: [
+    polar({
+      client,
+      createCustomerOnSignUp: true,
+      enableCustomerPortal: true,
+      checkout: {
+        enabled: true,
+        products: [
+          {
+            productId: 'af11d002-cb7a-4265-9e59-b43779f71342',
+            slug: 'pro',
+          },
+        ],
+        successUrl: '/success?checkout_id={CHECKOUT_ID}',
+      },
+    }),
+  ],
 })
