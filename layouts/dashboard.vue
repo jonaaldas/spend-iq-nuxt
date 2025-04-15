@@ -11,16 +11,18 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   type SidebarProps,
-} from '@/components/ui/sidebar'
+} from '~/components/ui/sidebar'
+import { authClient } from '../lib/auth-client'
 import { useFinanceStore } from '~/store/finance-store'
-const financeStore = useFinanceStore()
-
 import { GalleryVerticalEnd } from 'lucide-vue-next'
 
+const financeStore = useFinanceStore()
 const props = withDefaults(defineProps<SidebarProps>(), {
   variant: 'floating',
 })
 
+const hasActiveSubscription = ref(false)
+const filteredNavItems = ref([])
 // This is sample data.
 const data = {
   navMain: [
@@ -39,10 +41,46 @@ const data = {
       url: '/dashboard/accounts',
       items: [],
     },
+    {
+      title: 'Settings',
+      url: '/dashboard/settings',
+      items: [],
+    },
   ],
 }
 
+const logout = async () => {
+  await authClient.signOut({
+    fetchOptions: {
+      onSuccess: () => {
+        navigateTo('/login')
+      },
+      onError: () => {
+        console.error('Error signing out')
+      },
+    },
+  })
+}
+
+const checkActiveSubscription = async () => {
+  const paymentInformation = await $fetch('/api/auth/state')
+  hasActiveSubscription.value = paymentInformation.activeSubscriptions.length > 0
+}
+
+// [1,2,3].map
+const filterNavItems = () => {
+  const notAllowedIfNotActive = ['Home', 'Accounts']
+  filteredNavItems.value = data.navMain.filter(item => {
+    if (hasActiveSubscription.value) {
+      return true
+    }
+    return !notAllowedIfNotActive.includes(item.title)
+  })
+}
+
 onMounted(async () => {
+  await checkActiveSubscription()
+  filterNavItems()
   await financeStore.getData()
 })
 </script>
@@ -75,7 +113,7 @@ onMounted(async () => {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu class="gap-2">
-            <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
+            <SidebarMenuItem v-for="item in filteredNavItems" :key="item.title">
               <SidebarMenuButton as-child>
                 <a :href="item.url" class="font-medium">
                   {{ item.title }}
@@ -88,6 +126,11 @@ onMounted(async () => {
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
               </SidebarMenuSub>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton as-child>
+                <NuxtLink href="#" @click="logout">Logout</NuxtLink>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>

@@ -155,11 +155,11 @@
 </template>
 
 <script setup lang="ts">
-import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent } from '~~/components/ui/dialog'
+import { Button } from '~~/components/ui/button'
 import { Send, Bot, MessageSquare } from 'lucide-vue-next'
 import { useChat } from '@ai-sdk/vue'
-import { Textarea } from '@/components/ui/textarea'
+import { Textarea } from '~~/components/ui/textarea'
 import { micromark } from 'micromark'
 const apiError = ref<string | undefined>(undefined)
 const isLoading = ref(false)

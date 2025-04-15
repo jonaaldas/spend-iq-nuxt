@@ -10,7 +10,7 @@
     </div>
 
     <div v-if="loading" class="flex justify-center items-center min-h-[200px]">
-      <Loader2 class="w-8 h-8 animate-spin" />
+      <!-- <Loader2 class="w-8 h-8 animate-spin" /> -->
     </div>
 
     <div v-else class="grid gap-6">
@@ -58,14 +58,14 @@
 
 <script setup lang="ts">
 import { useFinanceStore } from '~/store/finance-store'
-import { Button } from '~/components/ui/button'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~/components/ui/card'
+import { Button } from '~~/components/ui/button'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~~/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '~/components/ui/dropdown-menu'
+} from '~~/components/ui/dropdown-menu'
 // import { RefreshCcw, Loader2, MoreHorizontal, Trash } from 'lucide-vue-next'
 
 definePageMeta({

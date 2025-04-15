@@ -56,9 +56,20 @@ import { useFinanceStore } from '~/store/finance-store'
 const financeStore = useFinanceStore()
 const { refresh, formatCurrency } = financeStore
 const { data, loading, categoryData, total } = storeToRefs(financeStore)
-
+import { authClient } from '../../lib/auth-client'
 definePageMeta({
   layout: 'dashboard',
+})
+
+onMounted(async () => {
+  // const res = await authClient.api.createCheckoutSession({
+  //   params: {
+  //     slug: 'pro',
+  //   },
+  //   headers: await headers(),
+  // })
+  // console.log(res)
+  // console.log(authClient.)
 })
 </script>
 

@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '~/components/ui/button'
+import { Button } from '~~/components/ui/button'
 import { LucidePlus } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import type { HTMLAttributes } from 'vue'

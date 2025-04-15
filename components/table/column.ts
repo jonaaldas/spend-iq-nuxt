@@ -3,7 +3,7 @@ import type { VNode, VNodeArrayChildren } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { createColumnHelper } from '@tanstack/vue-table'
 import { ArrowUpDown, ChevronDown } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
+import { Button } from '~~/components/ui/button'
 interface Location {
   address?: string
   city?: string

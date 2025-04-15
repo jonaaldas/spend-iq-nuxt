@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { Toggle } from '@/components/ui/toggle'
+import { Toggle } from '~~/components/ui/toggle'
 
 const emit = defineEmits<{
   (e: 'toggle-theme', theme: string): string

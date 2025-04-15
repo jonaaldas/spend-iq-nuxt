@@ -1,4 +1,5 @@
 {
   "mocha.enabled": false,
-  "postman.settings.dotenv-detection-notification-visibility": false
+  "postman.settings.dotenv-detection-notification-visibility": false,
+  "cSpell.words": ["nitropack"]
 }

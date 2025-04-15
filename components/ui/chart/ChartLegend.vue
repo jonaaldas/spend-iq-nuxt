@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { BulletLegendItemInterface } from '@unovis/ts'
-import { buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '~~/components/ui/button'
 import { BulletLegend } from '@unovis/ts'
 import { VisBulletLegend } from '@unovis/vue'
 import { nextTick, onMounted, ref } from 'vue'
@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<{ items: BulletLegendItemInterface[] }>()
 })
 
 const emits = defineEmits<{
-  'legendItemClick': [d: BulletLegendItemInterface, i: number]
+  legendItemClick: [d: BulletLegendItemInterface, i: number]
   'update:items': [payload: BulletLegendItemInterface[]]
 }>()
 
@@ -35,11 +35,18 @@ function onLegendItemClick(d: BulletLegendItemInterface, i: number) {
   const isFilterApplied = props.items.some(i => i.inactive)
   if (isFilterApplied && isBulletActive) {
     // reset filter
-    emits('update:items', props.items.map(item => ({ ...item, inactive: false })))
-  }
-  else {
+    emits(
+      'update:items',
+      props.items.map(item => ({ ...item, inactive: false }))
+    )
+  } else {
     // apply selection, set other item as inactive
-    emits('update:items', props.items.map(item => item.name === d.name ? ({ ...d, inactive: false }) : { ...item, inactive: true }))
+    emits(
+      'update:items',
+      props.items.map(item =>
+        item.name === d.name ? { ...d, inactive: false } : { ...item, inactive: true }
+      )
+    )
   }
   keepStyling()
 }
@@ -47,13 +54,12 @@ function onLegendItemClick(d: BulletLegendItemInterface, i: number) {
 
 <template>
   <div
-    ref="elRef" class="w-max" :style="{
+    ref="elRef"
+    class="w-max"
+    :style="{
       '--vis-legend-bullet-size': '16px',
     }"
   >
-    <VisBulletLegend
-      :items="items"
-      :on-legend-item-click="onLegendItemClick"
-    />
+    <VisBulletLegend :items="items" :on-legend-item-click="onLegendItemClick" />
   </div>
 </template>

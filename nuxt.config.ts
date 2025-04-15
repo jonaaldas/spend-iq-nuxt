@@ -1,8 +1,4 @@
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+import './server/utils/env'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -14,7 +10,7 @@ export default defineNuxtConfig({
     componentDir: './components/ui',
   },
   tailwindcss: {
-    cssPath: './assets/css/global.css',
+    cssPath: './css/global.css',
   },
   runtimeConfig: {
     redis: {
@@ -23,7 +19,21 @@ export default defineNuxtConfig({
       password: 'Ad7oAAIncDFmMmNiZWQ3OGJjMzY0MTMxOWRiNzc4ODdkMzc1MTg2M3AxNTcwNjQ',
       port: 6379,
     },
-    openaiApiKey: process.env.NUXT_OPENAI_API_KEY,
+    private: {
+      plaidClientId: process.env.NUXT_PLAID_CLIENT_ID,
+      plaidSecret: process.env.NUXT_PLAID_SECRET,
+      plaidEnv: process.env.NUXT_PLAID_ENV,
+      plaidProducts: process.env.NUXT_PLAID_PRODUCTS,
+      plaidCountryCodes: process.env.NUXT_PLAID_COUNTRY_CODES,
+      plaidRedirectUri: process.env.NUXT_PLAID_REDIRECT_URI,
+      tursoConnectionUrl: process.env.NUXT_TURSO_CONNECTION_URL,
+      tursoAuthToken: process.env.NUXT_TURSO_AUTH_TOKEN,
+      openaiApiKey: process.env.NUXT_OPENAI_API_KEY,
+      resendApiKey: process.env.NUXT_RESEND_API_KEY,
+      redisUrl: process.env.NUXT_REDIS_URL,
+      betterAuthSecret: process.env.NUXT_BETTER_AUTH_SECRET,
+      betterAuthUrl: process.env.NUXT_BETTER_AUTH_URL,
+    },
   },
   nitro: {
     storage: {
@@ -36,6 +46,7 @@ export default defineNuxtConfig({
         tls: {},
       },
     },
+    plugins: ['~/server/plugins/email'],
   },
   build: {
     transpile: ['vue'],
@@ -45,6 +56,11 @@ export default defineNuxtConfig({
       fs: {
         allow: ['/Users/jona/node_modules', '..', '/Users/jona'],
       },
+    },
+  },
+  routeRules: {
+    'dashboard/**': {
+      ssr: false,
     },
   },
 })
