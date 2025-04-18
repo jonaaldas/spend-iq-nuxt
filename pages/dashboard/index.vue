@@ -11,6 +11,7 @@
 import { Button } from '@/components/ui/button'
 definePageMeta({
   layout: 'dashboard',
+  middleware: 'auth',
 })
 const router = useRouter()
 </script>

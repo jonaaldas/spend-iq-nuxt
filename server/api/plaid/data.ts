@@ -1,7 +1,10 @@
 import { getPlaidData } from './components/fetch-data'
 
 export default defineEventHandler(async event => {
-  let userId = '1'
+  if (!event.context.auth) {
+    return { success: false, error: 'Unauthorized' }
+  }
+  let userId = event.context.auth?.user.id
 
   const result = await getPlaidData(event, userId)
 

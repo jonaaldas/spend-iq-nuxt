@@ -1,7 +1,6 @@
 <template>
   <div class="container mx-auto py-8 px-4">
     <h1 class="text-3xl font-bold mb-8">Settings</h1>
-
     <div class="grid gap-6">
       <!-- Customer Info Card -->
       <Card>
@@ -13,11 +12,11 @@
           <div class="space-y-4">
             <div>
               <label class="text-sm font-medium">Name</label>
-              <p class="text-lg">{{ userInformation?.data?.user?.name }}</p>
+              <p class="text-lg">{{ auth.auth.user.name }}</p>
             </div>
             <div>
               <label class="text-sm font-medium">Email</label>
-              <p class="text-lg">{{ userInformation?.data?.user?.email }}</p>
+              <p class="text-lg">{{ auth.auth.user.email }}</p>
             </div>
           </div>
         </CardContent>
@@ -29,8 +28,8 @@
       <!-- Pricing Card -->
       <Card
         v-if="
-          paymentInformation?.activeSubscriptions?.length == 0 ||
-          paymentInformation?.activeSubscriptions[0]?.status !== 'active'
+          auth.polarDetails.activeSubscriptions?.length == 0 ||
+          auth.polarDetails.activeSubscriptions[0]?.status !== 'active'
         "
       >
         <CardHeader>
@@ -55,7 +54,7 @@
       </Card>
 
       <!-- Billing Information Card -->
-      <Card v-if="paymentInformation?.activeSubscriptions?.length > 0">
+      <Card v-if="auth.polarDetails.activeSubscriptions?.length > 0">
         <CardHeader>
           <CardTitle>Billing Information</CardTitle>
           <CardDescription>View and manage your subscription details</CardDescription>
@@ -69,7 +68,7 @@
             <div>
               <label class="text-sm font-medium">Billing Period</label>
               <p class="text-lg">
-                {{ paymentInformation?.activeSubscriptions[0]?.recurringInterval }}
+                {{ auth.polarDetails.activeSubscriptions[0]?.recurringInterval }}
               </p>
             </div>
             <div>
@@ -77,7 +76,7 @@
               <p class="text-lg">
                 {{
                   new Date(
-                    paymentInformation?.activeSubscriptions[0]?.currentPeriodEnd
+                    auth.polarDetails.activeSubscriptions[0]?.currentPeriodEnd
                   ).toLocaleDateString()
                 }}
               </p>
@@ -95,9 +94,9 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'dashboard',
+  middleware: 'auth',
 })
 
-import { authClient } from '~/lib/auth-client'
 import {
   Card,
   CardContent,
@@ -107,9 +106,8 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+const auth = useState('auth')
 const router = useRouter()
-const userInformation = ref<any>(null)
-const paymentInformation = ref<any>(null)
 
 const changePassword = () => {
   router.push('/forgot-password')
@@ -122,12 +120,6 @@ const goToAuthPortal = () => {
 const goToCheckout = () => {
   window.open('/api/auth/checkout?productId=af11d002-cb7a-4265-9e59-b43779f71342')
 }
-
-onMounted(async () => {
-  const [user, payment] = await Promise.all([authClient.getSession(), $fetch('/api/auth/state')])
-  userInformation.value = user
-  paymentInformation.value = payment
-})
 </script>
 
 <style scoped></style>

@@ -1,7 +1,10 @@
 import { clearCache, getPlaidData } from './components/fetch-data'
 import type { PlaidTransactionsResponse, ErrorResponse } from './components/fetch-data'
 export default defineEventHandler(async event => {
-  const userId = '1'
+  if (!event.context.auth) {
+    return { success: false, error: 'Unauthorized' }
+  }
+  const userId = event.context.auth?.user.id
   const { error } = await tryCatch(clearCache(userId))
 
   if (error) {

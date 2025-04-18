@@ -9,6 +9,9 @@ export default defineNuxtConfig({
     prefix: '',
     componentDir: './components/ui',
   },
+  experimental: {
+    asyncContext: true,
+  },
   tailwindcss: {
     cssPath: './css/global.css',
   },
@@ -37,13 +40,19 @@ export default defineNuxtConfig({
   },
   nitro: {
     storage: {
-      redis: {
+      cache: {
         driver: 'redis',
         host: 'adjusted-gazelle-57064.upstash.io',
         password: 'Ad7oAAIncDFmMmNiZWQ3OGJjMzY0MTMxOWRiNzc4ODdkMzc1MTg2M3AxNTcwNjQ',
         port: 6379,
         db: 0,
         tls: {},
+      },
+    },
+    devStorage: {
+      cache: {
+        driver: 'fs',
+        base: '.cache',
       },
     },
     plugins: ['~/server/plugins/email'],

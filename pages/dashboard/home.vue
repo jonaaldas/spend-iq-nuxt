@@ -16,33 +16,41 @@
         <PlaidButton />
       </div>
     </div>
-    <div class="flex flex-row gap-6">
-      <DonutChart
-        class="w-2/5"
-        v-if="categoryData.length > 0"
-        index="name"
-        :category="'total'"
-        :data="categoryData"
-        :value-formatter="formatCurrency"
-      />
-      <div class="w-3/5 flex flex-col gap-4">
-        <div
-          v-for="item in categoryData"
-          :key="item.name"
-          class="flex flex-row justify-between gap-6"
-        >
-          <div>{{ item.name.charAt(0).toUpperCase() + item.name.toLowerCase().slice(1) }}</div>
-          <div>{{ formatCurrency(item.total) }}</div>
-        </div>
-        <div class="flex flex-row justify-between gap-6">
-          <div>Total Balance</div>
-          <div class="font-bold" :class="[total > 0 ? 'text-green-500' : 'text-red-500']">
-            {{ formatCurrency(total) }}
+    <div v-if="!loading && data.transactions.length > 0">
+      <div class="flex flex-row gap-6">
+        <DonutChart
+          class="w-2/5"
+          v-if="categoryData.length > 0"
+          index="name"
+          :category="'total'"
+          :data="categoryData"
+          :value-formatter="formatCurrency"
+        />
+        <div class="w-3/5 flex flex-col gap-4">
+          <div
+            v-for="item in categoryData"
+            :key="item.name"
+            class="flex flex-row justify-between gap-6"
+          >
+            <div>{{ item.name.charAt(0).toUpperCase() + item.name.toLowerCase().slice(1) }}</div>
+            <div>{{ formatCurrency(item.total) }}</div>
+          </div>
+          <div class="flex flex-row justify-between gap-6">
+            <div>Total Balance</div>
+            <div class="font-bold" :class="[total > 0 ? 'text-green-500' : 'text-red-500']">
+              {{ formatCurrency(total) }}
+            </div>
           </div>
         </div>
       </div>
+      <DataTable :columns="columns" :data="data.transactions" />
     </div>
-    <DataTable :columns="columns" :data="data.transactions" />
+    <div v-else>
+      <div class="flex flex-col gap-4">
+        <h3>No transactions found</h3>
+        <p>Please connect your bank accounts to see your transactions.</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -56,20 +64,9 @@ import { useFinanceStore } from '~/store/finance-store'
 const financeStore = useFinanceStore()
 const { refresh, formatCurrency } = financeStore
 const { data, loading, categoryData, total } = storeToRefs(financeStore)
-import { authClient } from '../../lib/auth-client'
 definePageMeta({
   layout: 'dashboard',
-})
-
-onMounted(async () => {
-  // const res = await authClient.api.createCheckoutSession({
-  //   params: {
-  //     slug: 'pro',
-  //   },
-  //   headers: await headers(),
-  // })
-  // console.log(res)
-  // console.log(authClient.)
+  middleware: 'auth',
 })
 </script>
 
