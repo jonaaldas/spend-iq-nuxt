@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1744495694382,
+      "tag": "0000_magenta_leo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1744717654705,
+      "tag": "0001_green_thor",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1744718006853,
+      "tag": "0002_aspiring_cyclops",
+      "breakpoints": true
+    }
+  ]
+}

@@ -11,14 +11,20 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   type SidebarProps,
-} from '@/components/ui/sidebar'
-
+} from '~/components/ui/sidebar'
+import { authClient } from '../lib/auth-client'
+import { useFinanceStore } from '~/store/finance-store'
 import { GalleryVerticalEnd } from 'lucide-vue-next'
 
+const financeStore = useFinanceStore()
+const { data: financeData } = storeToRefs(financeStore)
+const auth = useState('auth')
 const props = withDefaults(defineProps<SidebarProps>(), {
   variant: 'floating',
 })
 
+const hasActiveSubscription = ref(false)
+const filteredNavItems = ref([])
 // This is sample data.
 const data = {
   navMain: [
@@ -27,13 +33,62 @@ const data = {
       url: '/dashboard/home',
       items: [],
     },
+    // {
+    //   title: 'Transactions',
+    //   url: '/dashboard/transactions',
+    //   items: [],
+    // },
     {
-      title: 'Expenses',
-      url: '/dashboard/expenses',
+      title: 'Accounts',
+      url: '/dashboard/accounts',
+      items: [],
+    },
+    {
+      title: 'Settings',
+      url: '/dashboard/settings',
       items: [],
     },
   ],
 }
+
+const logout = async () => {
+  await authClient.signOut({
+    fetchOptions: {
+      onSuccess: () => {
+        window.location.href = '/login'
+      },
+      onError: () => {
+        console.error('Error signing out')
+      },
+    },
+  })
+}
+
+const checkActiveSubscription = async () => {
+  const { polarDetails } = auth.value
+  hasActiveSubscription.value = polarDetails.activeSubscriptions.length > 0
+}
+
+// [1,2,3].map
+const filterNavItems = () => {
+  const notAllowedIfNotActive = ['Home', 'Accounts']
+  filteredNavItems.value = data.navMain.filter(item => {
+    if (hasActiveSubscription.value) {
+      return true
+    }
+    return !notAllowedIfNotActive.includes(item.title)
+  })
+}
+
+onMounted(async () => {
+  await checkActiveSubscription()
+  filterNavItems()
+  await financeStore.getData()
+})
+
+definePageMeta({
+  middleware: ['auth'],
+})
 </script>
 
 <template>
@@ -50,8 +105,11 @@ const data = {
                   <GalleryVerticalEnd class="size-4" />
                 </div>
                 <div class="flex flex-col gap-0.5 leading-none">
-                  <span class="font-semibold">Documentation</span>
-                  <span class="">v1.0.0</span>
+                  <span
+                    class="font-semibold bg-gradient-to-r from-pink-500 via-purple-500 to-blue-600 bg-clip-text text-transparent"
+                    >SPEND IQ</span
+                  >
+                  <span class="text-xs text-muted-foreground">DEMO</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -61,26 +119,32 @@ const data = {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu class="gap-2">
-            <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
+            <SidebarMenuItem v-for="item in filteredNavItems" :key="item.title">
               <SidebarMenuButton as-child>
-                <a :href="item.url" class="font-medium">
+                <NuxtLink :href="item.url" class="font-medium">
                   {{ item.title }}
-                </a>
+                </NuxtLink>
               </SidebarMenuButton>
               <SidebarMenuSub v-if="item.items.length">
                 <SidebarMenuSubItem v-for="childItem in item.items" :key="childItem.title">
                   <SidebarMenuSubButton as-child :is-active="childItem.isActive">
-                    <a :href="childItem.url">{{ childItem.title }}</a>
+                    <NuxtLink :href="childItem.url">{{ childItem.title }}</NuxtLink>
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
               </SidebarMenuSub>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton as-child>
+                <NuxtLink href="#" @click="logout">Logout</NuxtLink>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-    <main>
+    <main class="flex flex-col h-screen p-12 w-full">
       <slot></slot>
     </main>
   </SidebarProvider>
+  <ChatBot v-if="financeData.transactions.length > 0" />
 </template>
