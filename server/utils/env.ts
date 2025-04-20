@@ -15,6 +15,5 @@ export const env = createEnv({
     NUXT_RESEND_API_KEY: z.string().min(1),
     NUXT_REDIS_URL: z.string().url(),
     NUXT_BETTER_AUTH_SECRET: z.string().min(1),
-    NUXT_BETTER_AUTH_URL: z.string().url(),
   },
 })
