@@ -16,9 +16,11 @@ export default defineLazyEventHandler(async () => {
     const timeoutId = setTimeout(() => controller.abort(), 18000) // 18-second timeout
 
     try {
+      if (!event.context.auth) {
+        throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+      }
       const { messages } = await readBody(event)
-      // const { userId } = event.context.auth
-      const userId = '1'
+      const userId = event.context.auth?.user.id
 
       if (!userId) {
         throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })

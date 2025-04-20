@@ -8,7 +8,7 @@
         <div class="flex h-full w-full flex-col overflow-hidden">
           <div class="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6">
             <div
-              v-if="messages.length === 0"
+              v-if="messages.length === 0 "
               class="flex flex-col items-center justify-center py-6 sm:py-8"
             >
               <Bot

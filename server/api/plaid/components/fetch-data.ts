@@ -171,9 +171,12 @@ const getPlaidData = defineCachedFunction(
   },
   {
     getKey: event => {
-      return getCachePrefix('1')
+      if (!event.context.auth) {
+        return Promise.reject(new Error('Unauthorized'))
+      }
+      return getCachePrefix(event.context.auth.user.id)
     },
-    base: 'redis',
+    base: 'cache',
     swr: false,
     maxAge: 60 * 60, //1h
   }
@@ -185,7 +188,7 @@ function getCachePrefix(userId: string): string {
 
 async function clearCache(userId: string): Promise<void> {
   const cachePrefix = getCachePrefix(userId)
-  const storage = useStorage('redis')
+  const storage = useStorage('cache')
   await storage.removeItem(`nitro:functions:_:${cachePrefix}.json`)
 }
 

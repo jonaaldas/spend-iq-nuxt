@@ -24,7 +24,7 @@ const signUp = async () => {
       description: error.message,
     })
   }
-  router.push('/')
+  router.push('/dashboard/settings')
 }
 </script>
 

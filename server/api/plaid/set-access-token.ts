@@ -9,7 +9,10 @@ const schema = z.object({
 })
 
 export default defineEventHandler(async event => {
-  let userId = '1'
+  if (!event.context.auth) {
+    return { success: false, error: 'Unauthorized' }
+  }
+  let userId = event.context.auth?.user.id
   const { public_token } = await readValidatedBody(event, schema.parse)
 
   const { data: tokenResponse, error } = await tryCatch(
