@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Button } from '~~/components/ui/button'
+import { Spiner } from 'lucide-vue-next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~~/components/ui/card'
 import { Input } from '~~/components/ui/input'
 import { Label } from '~~/components/ui/label'
@@ -12,7 +13,7 @@ const email = ref('')
 const password = ref('')
 
 const handleLogin = async () => {
-  const { data, error } = await authClient.signIn.email({
+  const { error } = await authClient.signIn.email({
     email: email.value,
     password: password.value,
   })
@@ -26,7 +27,7 @@ const handleLogin = async () => {
 </script>
 <template>
   <div class="flex flex-col items-center justify-center h-screen">
-    <Card class="mx-auto max-w-sm">
+    <Card class="max-w-sm mx-auto">
       <CardHeader>
         <CardTitle class="text-2xl"> Login </CardTitle>
         <CardDescription> Enter your email below to login to your account </CardDescription>
@@ -35,20 +36,37 @@ const handleLogin = async () => {
         <form class="grid gap-4" @submit.prevent="handleLogin">
           <div class="grid gap-2">
             <Label for="email">Email</Label>
-            <Input id="email" type="email" v-model="email" placeholder="m@example.com" required />
+            <Input
+              id="email"
+              type="email"
+              v-model="email"
+              placeholder="m@example.com"
+              required />
           </div>
           <div class="grid gap-2">
             <div class="flex items-center">
               <Label for="password">Password</Label>
-              <a href="#" class="ml-auto inline-block text-sm underline"> Forgot your password? </a>
+              <a
+                href="#"
+                class="inline-block ml-auto text-sm underline">
+                Forgot your password?
+              </a>
             </div>
-            <Input id="password" type="password" v-model="password" required />
+            <Input
+              id="password"
+              type="password"
+              v-model="password"
+              required />
           </div>
-          <Button type="submit" class="w-full"> Login </Button>
-        </form>
-        <div class="mt-4 text-center text-sm">
+          <Button type="submit" class="w-full" @click="handleLogin"> Login </Button>
+        </div>
+        <div class="mt-4 text-sm text-center">
           Don't have an account?
-          <a href="/register" class="underline"> Register </a>
+          <a
+            href="/register"
+            class="underline">
+            Register
+          </a>
         </div>
       </CardContent>
     </Card>
