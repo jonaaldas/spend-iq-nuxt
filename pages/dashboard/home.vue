@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4 container mx-auto max-w-screen-xl">
+  <div class="container flex flex-col max-w-screen-xl gap-4 mx-auto">
     <div class="flex justify-between">
       <div>
         <div class="prose">
@@ -8,7 +8,10 @@
         </div>
       </div>
       <div class="flex gap-2">
-        <Button variant="outline" @click="refresh" :disabled="loading">
+        <Button
+          variant="outline"
+          @click="refresh"
+          :disabled="loading">
           <!-- <RefreshCcw v-if="!loading" class="w-4 h-4" />
           <Loader2 v-else class="w-4 h-4 animate-spin" /> -->
           Refresh
@@ -24,26 +27,28 @@
           index="name"
           :category="'total'"
           :data="categoryData"
-          :value-formatter="formatCurrency"
-        />
-        <div class="w-3/5 flex flex-col gap-4">
+          :value-formatter="formatCurrency" />
+        <div class="flex flex-col w-3/5 gap-4">
           <div
             v-for="item in categoryData"
             :key="item.name"
-            class="flex flex-row justify-between gap-6"
-          >
+            class="flex flex-row justify-between gap-6">
             <div>{{ item.name.charAt(0).toUpperCase() + item.name.toLowerCase().slice(1) }}</div>
             <div>{{ formatCurrency(item.total) }}</div>
           </div>
           <div class="flex flex-row justify-between gap-6">
             <div>Total Balance</div>
-            <div class="font-bold" :class="[total > 0 ? 'text-green-500' : 'text-red-500']">
+            <div
+              class="font-bold"
+              :class="[total > 0 ? 'text-green-500' : 'text-red-500']">
               {{ formatCurrency(total) }}
             </div>
           </div>
         </div>
       </div>
-      <DataTable :columns="columns" :data="data.transactions" />
+      <DataTable
+        :columns="columns"
+        :data="data.transactions" />
     </div>
     <div v-else>
       <div class="flex flex-col gap-4">

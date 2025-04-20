@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from '~~/components/ui/button'
-import { Spiner } from 'lucide-vue-next'
+import { Loader2 } from 'lucide-vue-next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~~/components/ui/card'
 import { Input } from '~~/components/ui/input'
 import { Label } from '~~/components/ui/label'
@@ -11,8 +11,10 @@ import { toast } from 'vue-sonner'
 const router = useRouter()
 const email = ref('')
 const password = ref('')
+const isLoading = ref(false)
 
 const handleLogin = async () => {
+  isLoading.value = true
   const { error } = await authClient.signIn.email({
     email: email.value,
     password: password.value,
@@ -22,6 +24,7 @@ const handleLogin = async () => {
       description: error.message,
     })
   }
+  isLoading.value = false
   window.location.href = '/dashboard/home'
 }
 </script>
@@ -33,7 +36,9 @@ const handleLogin = async () => {
         <CardDescription> Enter your email below to login to your account </CardDescription>
       </CardHeader>
       <CardContent>
-        <form class="grid gap-4" @submit.prevent="handleLogin">
+        <form
+          class="grid gap-4"
+          @submit.prevent="handleLogin">
           <div class="grid gap-2">
             <Label for="email">Email</Label>
             <Input
@@ -58,8 +63,17 @@ const handleLogin = async () => {
               v-model="password"
               required />
           </div>
-          <Button type="submit" class="w-full" @click="handleLogin"> Login </Button>
-        </div>
+          <Button
+            type="submit"
+            class="w-full"
+            @click="handleLogin"
+            :disabled="isLoading">
+            <Loader2
+              v-if="isLoading"
+              class="w-4 h-4 mr-2 animate-spin" />
+            Login
+          </Button>
+        </form>
         <div class="mt-4 text-sm text-center">
           Don't have an account?
           <a
